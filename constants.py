@@ -1,0 +1,8 @@
+
+class CONSTANTS_2023:
+    FIELD_WIDTH = 315.5
+    FIELD_HEIGHT = 651.25
+
+    class POOFS_BOT:
+        MAX_ACCEL = 10
+        FRAME_SIZE = 26
