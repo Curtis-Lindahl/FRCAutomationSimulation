@@ -7,8 +7,9 @@ class PieceType(Enum):
 
 class Piece():
 
-    def __init__(self, pos):
+    def __init__(self, type: PieceType, pos):
         self.pos = pos
+        self.type =type
 
 class Environment:
 

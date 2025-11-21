@@ -26,11 +26,6 @@ class Robot:
             if self.velocity.x > self.targetVel.x:
                 self.velocity.x = self.targetVel.x
 
-        if self.velocity.x < -self.maxvel.x:
-            self.velocity.x = -self.maxvel.x
-        if self.velocity.x > self.maxvel.x:
-            self.velocity.x = self.maxvel.x
-
         if self.velocity.y > self.targetVel.y:
             self.velocity.y -= self.maxaccel.y * time_elapsed
             if self.velocity.y < self.targetVel.y:
@@ -40,11 +35,6 @@ class Robot:
             self.velocity.y += self.maxaccel.y * time_elapsed
             if self.velocity.y > self.targetVel.y:
                 self.velocity.y = self.targetVel.y
-
-        if self.velocity.y < -self.maxvel.y:
-            self.velocity.y = -self.maxvel.y
-        if self.velocity.y > self.maxvel.y:
-            self.velocity.y = self.maxvel.y
 
         self.pos.x += self.velocity.x * time_elapsed
         self.pos.y += self.velocity.y * time_elapsed

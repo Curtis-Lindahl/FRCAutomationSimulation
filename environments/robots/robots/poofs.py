@@ -1,8 +1,11 @@
+from pathlib import Path
 import sys
-# caution: path[0] is reserved for script path (or '' in REPL)
-sys.path.insert(1,)
 
-from robot import Robot
+parent_dir = str(Path(__file__).resolve().parents[1])
+
+sys.path.insert(0, parent_dir)
+from robot import Robot # use the module name
+
 from pygame import Vector2, Vector3
 import subsystems.elevator
 
@@ -10,8 +13,8 @@ class PoofsRobot(Robot):
 
     def __init__(self, x, y, theta, maxaccel, maxvel, frame_size):
         Robot.__init__(self, x, y, theta, maxaccel, maxvel, frame_size)
-        self.elevator = subsystems.elevator.Elevator(Vector3(-11, 0, 5), 42, 120, 120, 0)
-        self.laterator = subsystems.elevator.Elevator(Vector3(self.elevator.getEndPosition()), 60, 40, 40, Vector3(0, 15, 0))
+        self.elevator = subsystems.elevator.Elevator(Vector3(-11, 0, 5), 42, 120, 500, 0)
+        self.laterator = subsystems.elevator.Elevator(self.elevator.getEndPosition(), 60, 150, 500, Vector3(0, 15, 0))
 
     def update(self, time_elapsed):
         self.laterator.pos = self.elevator.getEndPosition()
