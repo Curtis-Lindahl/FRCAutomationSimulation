@@ -8,7 +8,7 @@ class JITBRobot(Robot):
     def __init__(self, x, y, theta, maxaccel, maxvel, frame_size):
         Robot.__init__(self, x, y, theta, maxaccel, maxvel, frame_size)
         self.pivot = subsystems.pivot.Pivot(Vector3(-10, 0, 8), 16, 45, 0, 180, 180, 250)
-        self.telescope = subsystems.elevator.Elevator(self.pivot.pos + Vector3(0, 0, -5), 75, 100, 100, self.pivot.angle)
+        self.telescope = subsystems.elevator.Elevator(self.pivot.pos + Vector3(0, 0, -5), 75, 200, 450, self.pivot.angle)
         self.wrist = subsystems.pivot.Pivot(self.telescope.getEndPosition(), 4.5, 90, 0, 180, 360, 500)
         self.intaking = False
 

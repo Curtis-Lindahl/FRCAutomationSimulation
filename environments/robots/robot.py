@@ -15,30 +15,43 @@ class Robot:
         self.targetVel = Vector2(0, 0)
 
     def update(self, time_elapsed):
+        # print("updating")
+        print(self.targetVel)
+
+        if self.targetVel.magnitude() == 0:
+            accel = Vector2(0,0)
+        else:
+            print(self.maxaccel)
+            accel = self.targetVel.normalize() * self.maxaccel
+            print()
+
+        print(accel)
 
         if self.velocity.x > self.targetVel.x:
-            self.velocity.x -= self.maxaccel.x * time_elapsed
+            self.velocity.x += accel.x * time_elapsed
             if self.velocity.x < self.targetVel.x:
                 self.velocity.x = self.targetVel.x
 
         if self.velocity.x < self.targetVel.x:
-            self.velocity.x += self.maxaccel.x * time_elapsed
+            self.velocity.x += accel.x * time_elapsed
             if self.velocity.x > self.targetVel.x:
                 self.velocity.x = self.targetVel.x
 
         if self.velocity.y > self.targetVel.y:
-            self.velocity.y -= self.maxaccel.y * time_elapsed
+            self.velocity.y += accel.y * time_elapsed
             if self.velocity.y < self.targetVel.y:
                 self.velocity.y = self.targetVel.y
 
         if self.velocity.y < self.targetVel.y:
-            self.velocity.y += self.maxaccel.y * time_elapsed
+            self.velocity.y += accel.y * time_elapsed
             if self.velocity.y > self.targetVel.y:
                 self.velocity.y = self.targetVel.y
 
         self.pos.x += self.velocity.x * time_elapsed
         self.pos.y += self.velocity.y * time_elapsed
         self.theta += self.dtheta * time_elapsed
+
+        print(self.velocity)
 
     def setTargetVel(self, targetVel: Vector2):
         self.targetVel = targetVel

@@ -14,7 +14,7 @@ class PoofsRobot(Robot):
     def __init__(self, x, y, theta, maxaccel, maxvel, frame_size):
         Robot.__init__(self, x, y, theta, maxaccel, maxvel, frame_size)
         self.elevator = subsystems.elevator.Elevator(Vector3(-11, 0, 5), 42, 120, 500, 0)
-        self.laterator = subsystems.elevator.Elevator(self.elevator.getEndPosition(), 60, 150, 500, Vector3(0, 15, 0))
+        self.laterator = subsystems.elevator.Elevator(self.elevator.getEndPosition(), 60, 150, 500, 75)
 
     def update(self, time_elapsed):
         self.laterator.pos = self.elevator.getEndPosition()
