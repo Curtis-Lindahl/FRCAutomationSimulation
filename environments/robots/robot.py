@@ -1,8 +1,10 @@
 from pygame import Vector2
 
+from environments.environment import Piece
+
 class Robot:
 
-    def __init__(self, x, y, theta, maxaccel, maxvel, frame_size: tuple):
+    def __init__(self, x, y, theta, maxaccel, maxvel, frame_size: tuple, piece: Piece):
         self.pos = Vector2(x, y)
         self.theta = theta
         self.velocity = Vector2(0, 0)
@@ -11,8 +13,9 @@ class Robot:
         self.maxaccel = maxaccel
         self.maxvel = maxvel
         self.frame = frame_size
-        self.hasPiece = True
         self.targetVel = Vector2(0, 0)
+        self.pieceHeld = piece
+        self.intaking = False
 
     def update(self, time_elapsed):
         # print("updating")
@@ -60,3 +63,25 @@ class Robot:
 
     def setTargetRotSpeed(self, targetVel):
         self.dtheta = targetVel
+
+    def canIntake(self, piece: Piece):
+        point1, point2 = self.getIntakeZone()
+        min_x, max_x = sorted((point1.x, point2.x))
+        min_y, max_y = sorted((point1.y, point2.y))
+        min_z, max_z = sorted((point1.z, point2.z))
+        # use inclusive bounds: min <= coord <= max
+        return (min_x <= piece.pos.x <= max_x and
+                min_y <= piece.pos.y <= max_y and
+                min_z <= piece.pos.z <= max_z)
+    
+    def intake(self, piece: Piece):
+        if super().pieceHeld != None:
+            return False
+        if self.canIntake(piece):
+            super().pieceHeld = piece
+            self.intaking = False
+            return True
+        return False
+    
+    def runIntake(self):
+        self.intaking = not self.intaking

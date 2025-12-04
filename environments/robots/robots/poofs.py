@@ -5,14 +5,15 @@ parent_dir = str(Path(__file__).resolve().parents[1])
 
 sys.path.insert(0, parent_dir)
 from robot import Robot # use the module name
+from environment import Piece
 
 from pygame import Vector2, Vector3
 import subsystems.elevator
 
 class PoofsRobot(Robot):
 
-    def __init__(self, x, y, theta, maxaccel, maxvel, frame_size):
-        Robot.__init__(self, x, y, theta, maxaccel, maxvel, frame_size)
+    def __init__(self, x, y, theta, maxaccel, maxvel, frame_size, piece):
+        Robot.__init__(self, x, y, theta, maxaccel, maxvel, frame_size, piece)
         self.elevator = subsystems.elevator.Elevator(Vector3(-11, 0, 5), 42, 120, 500, 0)
         self.laterator = subsystems.elevator.Elevator(self.elevator.getEndPosition(), 60, 150, 500, 75)
 
@@ -21,6 +22,9 @@ class PoofsRobot(Robot):
         super().update(time_elapsed)
         self.elevator.update(time_elapsed)
         self.laterator.update(time_elapsed)
+        if super().pieceHeld is not None:
+            super().pieceHeld.pos = self.laterator.getEndPosition() + Vector3(super().pos.x, super().pos.y, 0)
+
 
     # returns 2 positions that represent two vertices of the box of which if a piece is in it would intake
     # we will assume 8 wide, 4 tall, and 6 deep
@@ -30,23 +34,7 @@ class PoofsRobot(Robot):
         point2 = endPoint + Vector3(4, 3, 2)
         return point1, point2
     
-    def canIntake(self, gamePiecePosition):
-        point1, point2 = self.getIntakeZone()
-        min_x, max_x = sorted((point1.x, point2.x))
-        min_y, max_y = sorted((point1.y, point2.y))
-        min_z, max_z = sorted((point1.z, point2.z))
-        # use inclusive bounds: min <= coord <= max
-        return (min_x <= gamePiecePosition.x <= max_x and
-                min_y <= gamePiecePosition.y <= max_y and
-                min_z <= gamePiecePosition.z <= max_z)
     
-    def intake(self, gamePiecePosition):
-        if super().hasPiece:
-            return False
-        if self.canIntake(gamePiecePosition):
-            super().hasPiece = True
-            return True
-        return False
     
     def moveWithVel(self, targetVel: Vector2):
         super().setTargetVel(targetVel)
