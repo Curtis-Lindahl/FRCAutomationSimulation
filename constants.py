@@ -1,5 +1,5 @@
-from environments.environment import NodeType
-from pygame import Vector3
+from environments.piece import NodeType
+from pygame import Vector2, Vector3
 
 FIELD_WIDTH = 315.5
 FIELD_HEIGHT = 651.25
@@ -41,4 +41,7 @@ class FIELD_CONSTANTS:
     [Vector3(193.75, 47, 0), NodeType.HYBRID]
     ]
 
-    
+    chargeStationTopRight = Vector2(156.64, 191.125) # heres the top right
+    chargeStationBottomLeft = Vector2(59.39, 115) # heres the bottom left
+    chargeStationBalancedTopRight = Vector2(156.64, 173.06)
+    chargeStationBalancedBottomLeft = Vector2(59.39, 133.06)

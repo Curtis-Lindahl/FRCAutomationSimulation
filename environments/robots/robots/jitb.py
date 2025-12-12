@@ -1,16 +1,16 @@
 from robot import Robot
 from pygame import Vector2, Vector3
 import subsystems.elevator, subsystems.pivot
-from environment import Piece
+from piece import Piece
 
 # Telescoping arm on a wrist with low rear pivot
 class JITBRobot(Robot):
 
     def __init__(self, x, y, theta, maxaccel, maxvel, frame_size, piece):
         Robot.__init__(self, x, y, theta, maxaccel, maxvel, frame_size, piece)
-        self.pivot = subsystems.pivot.Pivot(Vector3(-10, 0, 8), 16, 45, 0, 180, 180, 250)
+        self.pivot = subsystems.pivot.Pivot(Vector3(-10, 0, 8), 16, 45, 0, 180, 180, 250, 0)
         self.telescope = subsystems.elevator.Elevator(self.pivot.pos + Vector3(0, 0, -5), 75, 200, 450, self.pivot.angle)
-        self.wrist = subsystems.pivot.Pivot(self.telescope.getEndPosition(), 4.5, 90, 0, 180, 360, 500)
+        self.wrist = subsystems.pivot.Pivot(self.telescope.getEndPosition(), 4.5, 90, 0, 180, 360, 500, 0)
         self.intaking = False
 
     def update(self, time_elapsed):
@@ -19,8 +19,8 @@ class JITBRobot(Robot):
         self.telescope.update(time_elapsed)
         self.wrist.pos = self.telescope.getEndPosition()
         self.wrist.update(time_elapsed)
-        if super().pieceHeld is not None:
-            super().pieceHeld.pos = self.wrist.getEndPosition() + Vector3(super().pos.x, super().pos.y, 0)
+        if self.pieceHeld is not None:
+            self.pieceHeld.pos = self.wrist.getEndPosition() + Vector3(self.pos.x, self.pos.y, 0)
 
     # returns 2 positions that represent two vertices of the box of which if a piece is in it would intake
     def getIntakeZone(self):

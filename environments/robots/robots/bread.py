@@ -1,4 +1,4 @@
-from environment import Piece, PieceType
+from piece import Piece, PieceType
 from robot import Robot
 from subsystems.elevator import Elevator
 from subsystems.pivot import Pivot

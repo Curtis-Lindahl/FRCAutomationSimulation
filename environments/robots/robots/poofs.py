@@ -5,7 +5,7 @@ parent_dir = str(Path(__file__).resolve().parents[1])
 
 sys.path.insert(0, parent_dir)
 from robot import Robot # use the module name
-from environment import Piece
+from piece import Piece
 
 from pygame import Vector2, Vector3
 import subsystems.elevator
@@ -22,8 +22,9 @@ class PoofsRobot(Robot):
         super().update(time_elapsed)
         self.elevator.update(time_elapsed)
         self.laterator.update(time_elapsed)
-        if super().pieceHeld is not None:
-            super().pieceHeld.pos = self.laterator.getEndPosition() + Vector3(super().pos.x, super().pos.y, 0)
+        if self.pieceHeld is not None:
+            self.pieceHeld.pos = self.laterator.getEndPosition() + Vector3(self.pos.x, self.pos.y, 0)
+            print("piece", self.pieceHeld.pos)
 
 
     # returns 2 positions that represent two vertices of the box of which if a piece is in it would intake

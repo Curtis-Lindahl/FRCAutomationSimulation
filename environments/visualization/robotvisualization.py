@@ -44,10 +44,14 @@ class RobotPositionVisualizer:
         'Pivot': (255, 170, 60),
     }
 
-    def __init__(self, robots: list[Robot] | None = None, screen_size=(1050, 700), pixels_per_unit=4):
-        pygame.init()
-        pygame.display.set_caption("Robot Position Visualizer")
-        self.screen = pygame.display.set_mode(screen_size)
+    def __init__(self, robots: list[Robot] | None = None, screen=None, screen_size=(1050, 700), pixels_per_unit=4):
+        # If an external screen is provided (embedding), reuse it to avoid resetting display.
+        if screen is None:
+            pygame.init()
+            pygame.display.set_caption("Robot Position Visualizer")
+            self.screen = pygame.display.set_mode(screen_size)
+        else:
+            self.screen = screen
         self.clock = pygame.time.Clock()
         self.running = True
         self.ppu = pixels_per_unit
@@ -176,10 +180,9 @@ class RobotPositionVisualizer:
 
     # Convenience API for embedding in other visualizations
     def draw(self, screen: pygame.Surface, origin: Vector2, ppu: float):
-        """Draw the current robot (perimeter only) at provided origin and scale."""
-        if self.current_index < 0 or not self.robots:
+        """Draw all robots (perimeter only) at provided origin and scale."""
+        if not self.robots:
             return
-        # robot = self.robots[self.current_index]
         for robot in self.robots:
             base_world = Vector2(robot.pos.x, robot.pos.y)
             w, h = robot.frame if isinstance(robot.frame, (tuple, list)) else (26, 26)
