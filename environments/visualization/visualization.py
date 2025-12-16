@@ -4,17 +4,17 @@
 - Side: draw standalone Elevator and Pivot using existing subsystem classes, controlled by keys.
 
 Controls:
-  Robot (center)
-	Arrows : move (Up = +Y, Down = -Y)
-	Q / E  : rotate CCW / CW
+    Robot (center)
+		Arrows : move (Up = +Y, Down = -Y)
+		Q / E  : rotate CCW / CW
 
-  Subsystems (left side)
-	W / S  : Elevator extend / retract
-	A / D  : Pivot CCW / CW
+    Subsystems (left side)
+		W / S  : Elevator extend / retract
+		A / D  : Pivot CCW / CW
 
-  Global
-	R      : Reset all
-	ESC    : Quit
+    Global
+		R      : Reset all
+		ESC    : Quit
 """
 
 from __future__ import annotations
@@ -126,7 +126,7 @@ class CombinedVisualizer:
 			self.screen.fill((28, 30, 36))
 			# Vertical divider between panels
 			pygame.draw.line(self.screen, (70, 75, 85), (int(self.screen.get_width()*0.35), 0),
-							 (int(self.screen.get_width()*0.35), self.screen.get_height()), 2)
+							(int(self.screen.get_width()*0.35), self.screen.get_height()), 2)
 
 			self.draw_subsystems_panel()
 			self.draw_robot()

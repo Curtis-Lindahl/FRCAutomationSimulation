@@ -20,21 +20,20 @@ from robots.robots.jitb import JITBRobot
 # robot = JITBRobot(0, 0, 0, 0, 0, (20, 20))
 # sim = Sim([PivotSim(robot.pivot), ElevatorSim(robot.telescope), PivotSim(robot.wrist)])
 
-robot = PoofsRobot(0, 0, 0, 100, 100, (20, 20), Piece(PieceType.CONE, Vector3(20, 20, 20)))
-robot2 = JITBRobot(0, 0, 0, 0, 0, (20, 20), Piece(PieceType.CUBE, Vector3(-20, 20, 20)))
-sim = SubsystemsSim([ElevatorSim(robot.elevator), ElevatorSim(robot.laterator), PivotSim(robot2.pivot), ElevatorSim(robot2.telescope), PivotSim(robot2.wrist)])
+robot2 = PoofsRobot(100, 100, 0, 5000, 200, (20, 20), Piece(PieceType.CONE, Vector3(20, 20, 20)))
+robot = JITBRobot(200, 200, 0, 5000, 170, (20, 20), Piece(PieceType.CUBE, Vector3(-20, 20, 20)))
+# sim = SubsystemsSim([ElevatorSim(robot.elevator), ElevatorSim(robot.laterator), PivotSim(robot2.pivot), ElevatorSim(robot2.telescope), PivotSim(robot2.wrist)])
 
 robots = [robot, robot2]
 
-sim.addRobots(robots)
+# sim.addRobots(robots)
 
 
-from robotvisualization import RobotPositionVisualizer
-visualization = RobotPositionVisualizer([robot])
-# visualization.run()
-# sim.loop()
+# robotvisualization is used inside EnvironmentVisualizer; do not instantiate
+# a standalone RobotPositionVisualizer here (it was created with a single
+# robot and could cause confusion). EnvironmentVisualizer will create its
+# own RobotPositionVisualizer bound to the full `robots` list below.
 
 env = Environment(robots=robots, startingPieces=[Piece(PieceType.CONE, Vector3(30, 30, 30)), Piece(PieceType.CUBE, Vector3(30, 30, 30))])
-print(env.pieces)
 viz = EnvironmentVisualizer(env)
 viz.run()

@@ -21,6 +21,11 @@ class Environment:
         self.pieces = startingPieces
         for robot in robots:
             self.pieces.append(robot.pieceHeld)
+        # expose scoring locations from constants on the environment
+        try:
+            self.scoring_locations = FIELD_CONSTANTS.SCORING_LOCATIONS
+        except Exception:
+            self.scoring_locations = []
         self.timeRemaining = 0
         self.scoring = ScoringManager()
         self.mode = MatchMode.DISABLED

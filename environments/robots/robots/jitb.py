@@ -19,6 +19,9 @@ class JITBRobot(Robot):
         self.telescope.update(time_elapsed)
         self.wrist.pos = self.telescope.getEndPosition()
         self.wrist.update(time_elapsed)
+        # Update base robot physics (position/velocity/rotation)
+        super().update(time_elapsed)
+
         if self.pieceHeld is not None:
             self.pieceHeld.pos = self.wrist.getEndPosition() + Vector3(self.pos.x, self.pos.y, 0)
 

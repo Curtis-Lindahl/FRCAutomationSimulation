@@ -47,11 +47,16 @@ from elevator import Elevator  # type: ignore
 from pivot import Pivot  # type: ignore
 from robotvisualization import RobotPositionVisualizer  # type: ignore
 from subsystemvisualization import SubsystemVisualizer  # type: ignore
+from constants import FIELD_CONSTANTS
+from piece import NodeType
 
 
 PIECE_COLORS = {
     PieceType.CUBE: (140, 110, 255),
     PieceType.CONE: (255, 210, 80),
+    NodeType.CUBE: (140, 110, 255),
+    NodeType.CONE: (255, 210, 80),
+    NodeType.HYBRID: (0, 0, 0),
 }
 
 
@@ -67,14 +72,64 @@ class EnvironmentVisualizer:
         self.clock = pygame.time.Clock()
         self.running = True
         self.env = env
+        # pixels_per_unit will be computed from the field image if available
         self.ppu = pixels_per_unit
 
         w, h = screen_size
-        self.field_origin = Vector2(int(w * 0.60), int(h * 0.78))
+        # divider for left subsystem panel vs right field panel
+        self.divider_x = int(w * 0.35)
         self.subsystem_origin = Vector2(int(w * 0.18), int(h * 0.78))
+
+        # Try to load a field background image and scale it to represent
+        # the real field in inches. Robot positions/dimensions are in inches,
+        # so we use 324in (width) x 648in (height) as the field extent here.
+        self.field_image = None
+        self.field_image_rect = None
+        field_image_path = os.path.join(os.path.dirname(__file__), "charged-up-field.jpg")
+        # field dimensions in inches (width, height)
+        field_units_w, field_units_h = 315.5, 651.5
+        try:
+            if os.path.exists(field_image_path):
+                img = pygame.image.load(field_image_path).convert()
+                # determine available width in right panel and scale image to fit
+                right_width = w - self.divider_x - 20
+                desired_field_px_w = int(right_width * 0.95)
+                # maintain the field aspect ratio using units (inches)
+                desired_field_px_h = int(desired_field_px_w * (field_units_h / field_units_w))
+                # If the desired height is too tall for screen, cap by height
+                max_field_h = int(h * 0.85)
+                if desired_field_px_h > max_field_h:
+                    desired_field_px_h = max_field_h
+                    desired_field_px_w = int(desired_field_px_h * (field_units_w / field_units_h))
+
+                self.field_image = pygame.transform.smoothscale(img, (desired_field_px_w, desired_field_px_h))
+                # compute pixels-per-unit (pixels per inch) based on scaled image width
+                self.ppu = desired_field_px_w / field_units_w
+
+                # center field image within right panel horizontally and place it with bottom aligned to ~78% height
+                field_left = self.divider_x + (right_width - desired_field_px_w) // 2 + 10
+                field_top = int(h * .9) - desired_field_px_h
+                self.field_image_rect = pygame.Rect(field_left, field_top, desired_field_px_w, desired_field_px_h)
+
+                # set field origin (world 0,0) to bottom-left of the image
+                self.field_origin = Vector2(self.field_image_rect.left, self.field_image_rect.top + self.field_image_rect.height)
+            else:
+                # fallback origin roughly where the original code placed it
+                self.field_origin = Vector2(int(w * 0.60), int(h * 0.78))
+        except Exception:
+            print("Field not found")
+            self.field_origin = Vector2(int(w * 0.60), int(h * 0.78))
 
         # Robot visualizer (reuse; no extra window created because we pass screen)
         self.robot_viz = RobotPositionVisualizer(robots=self.env.robots, screen=self.screen, screen_size=screen_size, pixels_per_unit=self.ppu)
+
+        # Scoring locations helper (attach to environment for programmatic access)
+        self.scoring_locations = self.env.scoring_locations
+        # expose on environment for other systems/tests
+        try:
+            self.env.scoring_locations = self.scoring_locations
+        except Exception:
+            pass
 
         # Collect subsystems from robots plus any provided extras
         subsystems = list(self._collect_subsystems(self.env.robots))
@@ -133,7 +188,7 @@ class EnvironmentVisualizer:
 
             # Fixed visual size (prevents expansion over time). Use a base size
             # in pixels; scale slightly by ppu if user wants larger visuals.
-            base_size = 10
+            base_size = 3
             size = max(4, int(base_size))
 
             # Draw cones as triangles and cubes as squares (screen-space)
@@ -171,6 +226,19 @@ class EnvironmentVisualizer:
         self.screen.fill((28, 30, 36))
         self.draw_divider()
         self.subsys_viz.draw(self.screen)
+        # Draw field background if available
+        if self.field_image is not None and self.field_image_rect is not None:
+            self.screen.blit(self.field_image, (self.field_image_rect.left, self.field_image_rect.top))
+
+        # Draw pieces and robots on top of the field image
+        # draw scoring nodes before pieces so pieces appear on top
+        if hasattr(self, 'scoring_locations'):
+            for loc in self.scoring_locations:
+                print("loc", type(loc[1]))
+                pos = loc[0]
+                screen_pos = world_to_screen(self.field_origin, self.ppu, Vector2(pos.x, pos.y) if hasattr(pos, "x") else Vector2(*pos))
+                color = PIECE_COLORS.get(loc[1], (00, 0, 0))
+                pygame.draw.circle(self.screen, color, (int(screen_pos.x), int(screen_pos.y)), 3)
         self.draw_pieces()
         self.robot_viz.draw(self.screen, origin=self.field_origin, ppu=self.ppu)
         self.draw_hud()
@@ -221,7 +289,6 @@ class EnvironmentVisualizer:
 def main():
     # Minimal demo environment with no robots and no pieces; plug in your robots/pieces to see them.
     env = Environment(robots=[], startingPieces=[Piece(PieceType.CONE, Vector3(0, 0, 0)), Piece(PieceType.CUBE, Vector3(10, 10, 0))])
-    print(env.pieces)
     viz = EnvironmentVisualizer(env)
     viz.run()
 

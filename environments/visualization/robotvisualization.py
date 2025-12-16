@@ -67,8 +67,7 @@ class RobotPositionVisualizer:
         keys = pygame.key.get_pressed()
         if self.current_index < 0:
             return
-        robot = self.robots[self.current_index]
-
+        # Apply the same input targets to all robots so they move together.
         move_speed = 180
         target_vel = Vector2(0, 0)
         if keys[pygame.K_LEFT]:
@@ -79,20 +78,25 @@ class RobotPositionVisualizer:
             target_vel.y += move_speed
         if keys[pygame.K_DOWN]:
             target_vel.y -= move_speed
-        robot.setTargetVel(target_vel)
+
+        for robot in self.robots:
+            robot.setTargetVel(target_vel)
 
         rot_speed = 120
         if keys[pygame.K_q]:
-            robot.setTargetRotSpeed(rot_speed)
+            for robot in self.robots:
+                robot.setTargetRotSpeed(rot_speed)
         elif keys[pygame.K_e]:
-            robot.setTargetRotSpeed(-rot_speed)
+            for robot in self.robots:
+                robot.setTargetRotSpeed(-rot_speed)
         else:
-            robot.setTargetRotSpeed(0)
+            for robot in self.robots:
+                robot.setTargetRotSpeed(0)
 
     def update(self, dt: float):
-        for r in self.robots:
+        for robot in self.robots:
             # Subsystems may need manual positional chaining (already handled in subclass update logic)
-            r.update(dt)
+            robot.update(dt)
 
     # ----------------------------- Drawing Helpers ----------------------------
     def draw_robot_frame(self, robot: Robot):
@@ -174,6 +178,7 @@ class RobotPositionVisualizer:
             self.screen.fill((30, 32, 38))
             for i, r in enumerate(self.robots):
                 self.draw_robot(r, i)
+                print(i)
             self.draw_hud()
             pygame.display.flip()
         pygame.quit()

@@ -16,6 +16,7 @@ class OPRobot(Robot):
         self.elbow.maxAngle = self.shoulder.angle + 135
         self.elbow.angle += self.shoulder.turnRate * time_elapsed
         self.elbow.update()
+        super().update()
         if super().pieceHeld is not None:
             super().pieceHeld.pos = self.elbow.getEndPosition() + Vector3(super().pos.x, super().pos.y, 0)
 

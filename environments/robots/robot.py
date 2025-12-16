@@ -22,47 +22,28 @@ class Robot:
         self.intaking = False
 
     def update(self, time_elapsed):
-        # print("updating")
-        print(self.targetVel)
 
-        if self.targetVel.magnitude() == 0:
-            accel = Vector2(0,0)
+        delta = self.targetVel - self.velocity
+        if delta.length() == 0:
+            accel = Vector2(0, 0)
         else:
-            print(self.maxaccel)
-            accel = self.targetVel.normalize() * self.maxaccel
-            print()
+            accel = delta.normalize() * self.maxaccel
 
-        print(accel)
+        step = accel * time_elapsed
 
-        if self.velocity.x > self.targetVel.x:
-            self.velocity.x += accel.x * time_elapsed
-            if self.velocity.x < self.targetVel.x:
-                self.velocity.x = self.targetVel.x
+        if step.length() >= delta.length():
+            self.velocity = Vector2(self.targetVel)
+        else:
+            self.velocity += step
 
-        if self.velocity.x < self.targetVel.x:
-            self.velocity.x += accel.x * time_elapsed
-            if self.velocity.x > self.targetVel.x:
-                self.velocity.x = self.targetVel.x
-
-        if self.velocity.y > self.targetVel.y:
-            self.velocity.y += accel.y * time_elapsed
-            if self.velocity.y < self.targetVel.y:
-                self.velocity.y = self.targetVel.y
-
-        if self.velocity.y < self.targetVel.y:
-            self.velocity.y += accel.y * time_elapsed
-            if self.velocity.y > self.targetVel.y:
-                self.velocity.y = self.targetVel.y
-
+        # integrate position and rotation
         self.pos.x += self.velocity.x * time_elapsed
         self.pos.y += self.velocity.y * time_elapsed
         self.theta += self.dtheta * time_elapsed
 
-        print(self.velocity)
-
     def setTargetVel(self, targetVel: Vector2):
-        self.targetVel = targetVel
-        if targetVel.magnitude() > self.maxvel:
+        self.targetVel = Vector2(targetVel)
+        if self.targetVel.length() > self.maxvel:
             self.targetVel = self.targetVel.normalize() * self.maxvel
 
     def setTargetRotSpeed(self, targetVel):
@@ -79,10 +60,10 @@ class Robot:
                 min_z <= piece.pos.z <= max_z)
     
     def intake(self, piece: Piece):
-        if super().pieceHeld != None:
+        if self.pieceHeld is not None:
             return False
         if self.canIntake(piece):
-            super().pieceHeld = piece
+            self.pieceHeld = piece
             self.intaking = False
             return True
         return False
