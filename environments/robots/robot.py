@@ -13,7 +13,6 @@ class Robot:
         self.theta = theta
         self.velocity = Vector2(0, 0)
         self.dtheta = 0
-        self.ddtheta = 0
         self.maxaccel = maxaccel
         self.maxvel = maxvel
         self.frame = frame_size

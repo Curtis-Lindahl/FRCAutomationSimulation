@@ -11,7 +11,6 @@ class JITBRobot(Robot):
         self.pivot = subsystems.pivot.Pivot(Vector3(-10, 0, 8), 16, 45, 0, 180, 180, 250, 0)
         self.telescope = subsystems.elevator.Elevator(self.pivot.pos + Vector3(0, 0, -5), 75, 200, 450, self.pivot.angle)
         self.wrist = subsystems.pivot.Pivot(self.telescope.getEndPosition(), 4.5, 90, 0, 180, 360, 500, 0)
-        self.intaking = False
 
     def update(self, time_elapsed):
         self.pivot.update(time_elapsed)
