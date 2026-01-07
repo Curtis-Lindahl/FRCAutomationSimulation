@@ -13,6 +13,9 @@ from environment import Environment
 from subsystemvisualization import SubsystemsSim, ElevatorSim, PivotSim
 from robots.robots.poofs import PoofsRobot
 from robots.robots.jitb import JITBRobot
+from robots.robots.krawler import KrawlerBot
+from robots.robots.bread import BreadRobot
+from robots.robots.op import OPRobot
 
 # robot = PoofsRobot(0, 0, 0, 0, 0, (20, 20))
 # sim = Sim([ElevatorSim(robot.elevator), ElevatorSim(robot.laterator)])
@@ -20,11 +23,15 @@ from robots.robots.jitb import JITBRobot
 # robot = JITBRobot(0, 0, 0, 0, 0, (20, 20))
 # sim = Sim([PivotSim(robot.pivot), ElevatorSim(robot.telescope), PivotSim(robot.wrist)])
 
-robot2 = PoofsRobot(100, 100, 0, 5000, 200, (20, 20), Piece(PieceType.CONE, Vector3(20, 20, 20)))
-robot = JITBRobot(200, 200, 0, 5000, 170, (20, 20), Piece(PieceType.CUBE, Vector3(-20, 20, 20)))
+jitb = PoofsRobot(100, 100, 0, 5000, 200, (28, 28), Piece(PieceType.CONE, Vector3(20, 20, 20)))
+poof = JITBRobot(200, 200, 0, 5000, 170, (26, 26), Piece(PieceType.CUBE, Vector3(-20, 20, 20)))
+krawler = KrawlerBot(150, 200, 0, 5000, 200, (25, 25), Piece(PieceType.CONE, Vector3()))
+bread = BreadRobot(300, 100, 0, 5000, 220, (30, 30), Piece(PieceType.CONE, Vector3()))
+op = OPRobot(400, 200, 0, 5000, 190, (30, 30), Piece(PieceType.CUBE, Vector3()))
 # sim = SubsystemsSim([ElevatorSim(robot.elevator), ElevatorSim(robot.laterator), PivotSim(robot2.pivot), ElevatorSim(robot2.telescope), PivotSim(robot2.wrist)])
 
-robots = [robot, robot2]
+robots = [jitb, poof, krawler, bread, op]
+# robots = [op, krawler]
 
 # sim.addRobots(robots)
 

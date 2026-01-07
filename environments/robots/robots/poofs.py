@@ -23,7 +23,7 @@ class PoofsRobot(Robot):
         self.elevator.update(time_elapsed)
         self.laterator.update(time_elapsed)
         if self.pieceHeld is not None:
-            self.pieceHeld.pos = self.laterator.getEndPosition() + Vector3(self.pos.x, self.pos.y, 0)
+            self.pieceHeld.pos = self.laterator.getEndPosition().rotate(self.theta, Vector3(0, 0, 1)) + Vector3(self.pos.x, self.pos.y, 0)
 
 
     # returns 2 positions that represent two vertices of the box of which if a piece is in it would intake

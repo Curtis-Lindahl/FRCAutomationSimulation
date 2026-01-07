@@ -11,14 +11,20 @@ class OPRobot(Robot):
 
     def update(self, time_elapsed):
         self.shoulder.update(time_elapsed)
+        print(self.shoulder.getEndPosition())
+        print(self.shoulder.angle)
+
         self.elbow.pos = self.shoulder.getEndPosition()
         self.elbow.minAngle = self.shoulder.angle
         self.elbow.maxAngle = self.shoulder.angle + 135
-        self.elbow.angle += self.shoulder.turnRate * time_elapsed
-        self.elbow.update()
-        super().update()
-        if super().pieceHeld is not None:
-            super().pieceHeld.pos = self.elbow.getEndPosition() + Vector3(super().pos.x, super().pos.y, 0)
+        # self.elbow.angle += self.shoulder.turnRate * time_elapsed
+        self.elbow.update(time_elapsed)
+        super().update(time_elapsed)
+        print(self.shoulder.getEndPosition())
+        print(self.shoulder.angle)
+        if self.pieceHeld is not None:
+            print(self.pieceHeld)
+            self.pieceHeld.pos = self.elbow.getEndPosition().rotate(self.theta, Vector3(0, 0, 1)) + Vector3(self.pos.x, self.pos.y, 0)
 
     def getIntakeZone(self):
         endPoint = self.elbow.getEndPosition()
@@ -33,4 +39,4 @@ class OPRobot(Robot):
         self.shoulder.setTargetVel(targetVel)
 
     def setElboxVelocity(self, targetVel):
-        self.shoulder.setTargetVel(targetVel)
+        self.elbow.setTargetVel(targetVel)

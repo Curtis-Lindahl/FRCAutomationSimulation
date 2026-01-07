@@ -14,18 +14,6 @@ import pygame
 from pygame import Vector2
 
 
-def _ensure_paths():
-    here = os.path.dirname(os.path.dirname(__file__))  # .../environments
-    subsystems_dir = os.path.join(here, 'robots', 'subsystems')
-    if subsystems_dir not in sys.path:
-        sys.path.append(subsystems_dir)
-
-
-_ensure_paths()
-from elevator import Elevator  # type: ignore
-from pivot import Pivot  # type: ignore
-
-
 def world_to_screen(origin_px: Vector2, ppu: float, v: Vector2) -> Vector2:
     return Vector2(origin_px.x + v.x * ppu, origin_px.y - v.y * ppu)
 
@@ -34,6 +22,18 @@ class SubsystemVisualizer:
     """Manages a collection of subsystem instances and draws them in a side panel."""
 
     def __init__(self, subsystems: list, origin: Vector2, pixels_per_unit: float):
+        # Import classes dynamically to get the correct ones after paths are set up
+        import sys
+        if 'subsystems.elevator' in sys.modules:
+            Elevator = sys.modules['subsystems.elevator'].Elevator
+            Pivot = sys.modules['subsystems.pivot'].Pivot
+        else:
+            # Fallback - try direct import
+            from subsystems.elevator import Elevator
+            from subsystems.pivot import Pivot
+        
+        self.Elevator = Elevator
+        self.Pivot = Pivot
         self.subsystems = subsystems
         self.origin = origin
         self.ppu = pixels_per_unit
@@ -61,20 +61,20 @@ class SubsystemVisualizer:
             atarget -= piv_speed
 
         for s in self.subsystems:
-            if isinstance(s, Elevator):
+            if isinstance(s, self.Elevator):
                 s.setTargetVel(target)
-            elif isinstance(s, Pivot):
+            elif isinstance(s, self.Pivot):
                 s.setTargetVel(atarget)
 
     def update(self, dt: float):
         for s in self.subsystems:
             s.update(dt)
-            if isinstance(s, Elevator):
+            if isinstance(s, self.Elevator):
                 if s.height < 0:
                     s.height = 0
                 if s.height > s.maxheight:
                     s.height = s.maxheight
-            elif isinstance(s, Pivot):
+            elif isinstance(s, self.Pivot):
                 if s.angle < s.minAngle:
                     s.angle = s.minAngle
                 if s.angle > s.maxAngle:
@@ -82,12 +82,18 @@ class SubsystemVisualizer:
 
     def draw(self, screen: pygame.Surface):
         # Draw elevators first, then pivots slightly below using a visual offset
+        drawn = False
         for s in self.subsystems:
-            if isinstance(s, Elevator):
+            if isinstance(s, self.Elevator):
                 self._draw_elevator(screen, s)
+                drawn = True
         for s in self.subsystems:
-            if isinstance(s, Pivot):
+            if isinstance(s, self.Pivot):
                 self._draw_pivot(screen, s)
+                drawn = True
+        
+        if drawn:
+            pass  # Subsystems drawn successfully
 
         # Labels
         font = pygame.font.SysFont("consolas", 18)

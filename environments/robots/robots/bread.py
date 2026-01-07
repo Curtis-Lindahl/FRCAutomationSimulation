@@ -11,15 +11,16 @@ class BreadRobot(Robot):
         self.elevator = Elevator(Vector3(0, 9, 15), 40, 60, 60, 38)
         self.manipulatorPivot = Pivot(self.elevator.getEndPosition(), 12, 110, -45, 110, 180, 180)
         self.intakePivot = Pivot(Vector3(0, -12, 12), 15, 0, 0, 90, 150, 150)
+        # self.subssytems = [self.elevator, self.manipulatorPivot, self.intakePivot]
 
     def update(self, time_elapsed):
-        self.intakePivot.update()
-        self.elevator.update()
+        self.intakePivot.update(time_elapsed)
+        self.elevator.update(time_elapsed)
         self.manipulatorPivot.pos = self.elevator.getEndPosition()
-        self.manipulatorPivot.update()
+        self.manipulatorPivot.update(time_elapsed)
         super().update(time_elapsed)
-        if super().pieceHeld is not None:
-            super().pieceHeld.pos = self.manipulatorPivot.getEndPosition() + Vector3(super().pos.x, super().pos.y, 0)
+        if self.pieceHeld is not None:
+            self.pieceHeld.pos = self.manipulatorPivot.getEndPosition().rotate(self.theta, Vector3(0, 0, 1)) + Vector3(self.pos.x, self.pos.y, 0)
 
     # returns 2 positions that represent two vertices of the box of which if a piece is in it would intake
     # we will assume 8 wide, 4 tall, and 6 deep

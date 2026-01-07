@@ -43,12 +43,12 @@ def _augment_path():
 _augment_path()
 from piece import Piece, PieceType  # type: ignore
 from environment import Environment
-from elevator import Elevator  # type: ignore
-from pivot import Pivot  # type: ignore
 from robotvisualization import RobotPositionVisualizer  # type: ignore
 from subsystemvisualization import SubsystemVisualizer  # type: ignore
 from constants import FIELD_CONSTANTS
 from piece import NodeType
+from subsystems.elevator import Elevator
+from subsystems.pivot import Pivot
 
 
 PIECE_COLORS = {
@@ -65,7 +65,7 @@ def world_to_screen(origin_px: Vector2, ppu: float, v: Vector2) -> Vector2:
 
 
 class EnvironmentVisualizer:
-    def __init__(self, env: Environment, screen_size=(1280, 760), pixels_per_unit=3):
+    def __init__(self, env: Environment, screen_size=(1280, 1040), pixels_per_unit=3):
         pygame.init()
         pygame.display.set_caption("Environment Visualizer")
         self.screen = pygame.display.set_mode(screen_size)
@@ -78,7 +78,10 @@ class EnvironmentVisualizer:
         w, h = screen_size
         # divider for left subsystem panel vs right field panel
         self.divider_x = int(w * 0.35)
-        self.subsystem_origin = Vector2(int(w * 0.18), int(h * 0.78))
+        self.divider_y = int(h * 0.73)  # horizontal divider for bottom side-view panel
+        self.subsystem_origin = Vector2(int(w * 0.18), int(h * 0.57))
+        # Side view (x-z) origin at bottom panel
+        self.side_view_origin = Vector2(int(w * 0.50), int(h * 0.95))
 
         # Try to load a field background image and scale it to represent
         # the real field in inches. Robot positions/dimensions are in inches,
@@ -124,7 +127,6 @@ class EnvironmentVisualizer:
         self.robot_viz = RobotPositionVisualizer(robots=self.env.robots, screen=self.screen, screen_size=screen_size, pixels_per_unit=self.ppu)
 
         # Scoring locations helper (attach to environment for programmatic access)
-        self.scoring_locations = self.env.scoring_locations
         # expose on environment for other systems/tests
         try:
             self.env.scoring_locations = self.scoring_locations
@@ -133,6 +135,8 @@ class EnvironmentVisualizer:
 
         # Collect subsystems from robots plus any provided extras
         subsystems = list(self._collect_subsystems(self.env.robots))
+        print(self.env.robots)
+        print(subsystems)
         self.subsys_viz = SubsystemVisualizer(subsystems=subsystems, origin=self.subsystem_origin, pixels_per_unit=self.ppu)
 
     # -------------- Helpers --------------
@@ -208,7 +212,39 @@ class EnvironmentVisualizer:
 
     def draw_divider(self):
         x = int(self.screen.get_width() * 0.35)
-        pygame.draw.line(self.screen, (70, 75, 85), (x, 0), (x, self.screen.get_height()), 2)
+        pygame.draw.line(self.screen, (70, 75, 85), (x, 0), (x, self.divider_y), 2)
+        # horizontal divider for bottom panel
+        pygame.draw.line(self.screen, (70, 75, 85), (0, self.divider_y), (self.screen.get_width(), self.divider_y), 2)
+
+    def draw_side_view(self):
+        """Draw x-z side view of robots and pieces (side profile)."""
+        # Draw axis labels
+        font = pygame.font.SysFont('consolas', 14)
+        label = font.render('Side View (X-Z)', True, (180, 180, 180))
+        self.screen.blit(label, (10, self.divider_y + 10))
+
+        # Draw robots in x-z plane
+        for robot in self.env.robots:
+            # project x (horizontal) and z (vertical on screen)
+            world_xz = Vector2(robot.pos.x, 0)  # z is 0 for ground-level robots
+            scr = world_to_screen(self.side_view_origin, self.ppu, world_xz)
+            # draw simple rectangle for robot frame width
+            w, h_frame = robot.frame if isinstance(robot.frame, (tuple, list)) else (26, 26)
+            rect = pygame.Rect(int(scr.x - w/2 * self.ppu), int(scr.y - 10), int(w * self.ppu), 20)
+            pygame.draw.rect(self.screen, (90, 110, 150), rect, width=2)
+
+        # Draw pieces in x-z plane
+        for piece in self._iter_pieces():
+            if not isinstance(piece, Piece):
+                continue
+            try:
+                # x horizontal, z vertical (height off ground)
+                world_xz = Vector2(piece.pos.x, piece.pos.z if hasattr(piece.pos, 'z') else 0)
+                scr = world_to_screen(self.side_view_origin, self.ppu, world_xz)
+                color = PIECE_COLORS.get(piece.type, (200, 200, 200))
+                pygame.draw.circle(self.screen, color, (int(scr.x), int(scr.y)), 4)
+            except Exception:
+                continue
 
     def draw_hud(self):
         font = pygame.font.SysFont("consolas", 18)
@@ -224,9 +260,8 @@ class EnvironmentVisualizer:
 
     def draw(self):
         self.screen.fill((28, 30, 36))
-        self.draw_divider()
-        self.subsys_viz.draw(self.screen)
-        # Draw field background if available
+        
+        # Draw field background if available (right panel only)
         if self.field_image is not None and self.field_image_rect is not None:
             self.screen.blit(self.field_image, (self.field_image_rect.left, self.field_image_rect.top))
 
@@ -241,6 +276,16 @@ class EnvironmentVisualizer:
                 pygame.draw.circle(self.screen, color, (int(screen_pos.x), int(screen_pos.y)), 3)
         self.draw_pieces()
         self.robot_viz.draw(self.screen, origin=self.field_origin, ppu=self.ppu)
+
+        # Draw divider (separates left and right panels)
+        self.draw_divider()
+
+        # Draw subsystems on top (left panel) - drawn last so not covered
+        self.subsys_viz.draw(self.screen)
+
+        # Draw side view panel (bottom)
+        self.draw_side_view()
+
         self.draw_hud()
         pygame.display.flip()
 
