@@ -31,7 +31,7 @@ op = OPRobot(400, 200, 0, 5000, 190, (30, 30), Piece(PieceType.CUBE, Vector3()))
 # sim = SubsystemsSim([ElevatorSim(robot.elevator), ElevatorSim(robot.laterator), PivotSim(robot2.pivot), ElevatorSim(robot2.telescope), PivotSim(robot2.wrist)])
 
 robots = [jitb, poof, krawler, bread, op]
-# robots = [op, krawler]
+robots = [op]
 
 # sim.addRobots(robots)
 

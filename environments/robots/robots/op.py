@@ -11,8 +11,6 @@ class OPRobot(Robot):
 
     def update(self, time_elapsed):
         self.shoulder.update(time_elapsed)
-        print(self.shoulder.getEndPosition())
-        print(self.shoulder.angle)
 
         self.elbow.pos = self.shoulder.getEndPosition()
         self.elbow.minAngle = self.shoulder.angle
@@ -21,7 +19,7 @@ class OPRobot(Robot):
         self.elbow.update(time_elapsed)
         super().update(time_elapsed)
         print(self.shoulder.getEndPosition())
-        print(self.shoulder.angle)
+        print(self.elbow.pos)
         if self.pieceHeld is not None:
             print(self.pieceHeld)
             self.pieceHeld.pos = self.elbow.getEndPosition().rotate(self.theta, Vector3(0, 0, 1)) + Vector3(self.pos.x, self.pos.y, 0)

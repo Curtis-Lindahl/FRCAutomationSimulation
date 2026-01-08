@@ -121,7 +121,7 @@ class SubsystemVisualizer:
         pygame.draw.circle(screen, (80, 200, 255), car_screen, 7)
 
     def _draw_pivot(self, screen: pygame.Surface, s: Pivot):
-        base_world = Vector2(s.pos.x, s.pos.y) + self.pivot_offset
+        base_world = Vector2(s.pos.x, s.pos.z) + self.pivot_offset
         base_screen = world_to_screen(self.origin, self.ppu, base_world)
         arm_dir = Vector2(s.length, 0).rotate(s.angle)
         end_world = base_world + arm_dir

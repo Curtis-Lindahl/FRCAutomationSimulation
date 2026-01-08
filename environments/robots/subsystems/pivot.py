@@ -1,7 +1,7 @@
 from pygame import Vector2, Vector3
 
 class Pivot:
-    def __init__(self, pivot_point: Vector3, length, startAngle, minAngle, maxAngle, maxTurnRate, accel, angleOffset):
+    def __init__(self, pivot_point: Vector3, length, startAngle, minAngle, maxAngle, maxTurnRate, accel, angleOffset=0):
         self.pos = pivot_point
         self.length = length
         self.angle = startAngle
@@ -33,7 +33,7 @@ class Pivot:
         self.angle += self.turnRate * time_elapsed
 
     def getEndPosition(self):
-        return self.pos + (Vector3(self.length, 0, 0).rotate(self.angle, Vector3(1, 0, 0)).rotate(self.angleOffset, Vector3(1, 0, 0)))
+        return self.pos + (Vector3(self.length, 0, 0).rotate(-(self.angle + self.angleOffset), Vector3(0, 1, 0)))
     
     def setTargetVel(self, targetVel):
         self.targetVel = targetVel
