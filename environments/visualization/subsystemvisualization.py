@@ -108,7 +108,7 @@ class SubsystemVisualizer:
 
     # ----- Draw helpers -----
     def _draw_elevator(self, screen: pygame.Surface, s: Elevator):
-        base_world = Vector2(s.pos.x, s.pos.y)
+        base_world = Vector2(s.pos.x, s.pos.z)
         base_screen = world_to_screen(self.origin, self.ppu, base_world)
         rail_dir = Vector2(0, s.maxheight).rotate(s.angle)
         rail_end = world_to_screen(self.origin, self.ppu, base_world + rail_dir)

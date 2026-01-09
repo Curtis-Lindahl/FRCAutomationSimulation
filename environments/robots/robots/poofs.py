@@ -18,9 +18,9 @@ class PoofsRobot(Robot):
         self.laterator = subsystems.elevator.Elevator(self.elevator.getEndPosition(), 60, 150, 500, 75)
 
     def update(self, time_elapsed):
-        self.laterator.pos = self.elevator.getEndPosition()
         super().update(time_elapsed)
         self.elevator.update(time_elapsed)
+        self.laterator.pos = self.elevator.getEndPosition()
         self.laterator.update(time_elapsed)
         if self.pieceHeld is not None:
             self.pieceHeld.pos = self.laterator.getEndPosition().rotate(self.theta, Vector3(0, 0, 1)) + Vector3(self.pos.x, self.pos.y, 0)

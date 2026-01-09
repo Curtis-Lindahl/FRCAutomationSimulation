@@ -14,6 +14,7 @@ class JITBRobot(Robot):
 
     def update(self, time_elapsed):
         self.pivot.update(time_elapsed)
+        self.telescope.pos = self.pivot.getEndPosition()
         self.telescope.angle = self.pivot.angle
         self.telescope.update(time_elapsed)
         self.wrist.pos = self.telescope.getEndPosition()

@@ -178,7 +178,6 @@ class RobotPositionVisualizer:
             self.screen.fill((30, 32, 38))
             for i, r in enumerate(self.robots):
                 self.draw_robot(r, i)
-                print(i)
             self.draw_hud()
             pygame.display.flip()
         pygame.quit()

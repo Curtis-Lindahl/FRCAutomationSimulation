@@ -14,6 +14,7 @@ class KrawlerBot(Robot):
     def update(self, time_elapsed):
         super().update(time_elapsed)
         self.elevator.update(time_elapsed)
+        self.wrist.pos = self.elevator.getEndPosition()
         self.wrist.update(time_elapsed)
         if self.pieceHeld is not None:
             self.pieceHeld.pos = self.wrist.getEndPosition().rotate(self.theta, Vector3(0, 0, 1)) + Vector3(self.pos.x, self.pos.y, 0)

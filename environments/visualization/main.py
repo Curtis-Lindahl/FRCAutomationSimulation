@@ -23,15 +23,15 @@ from robots.robots.op import OPRobot
 # robot = JITBRobot(0, 0, 0, 0, 0, (20, 20))
 # sim = Sim([PivotSim(robot.pivot), ElevatorSim(robot.telescope), PivotSim(robot.wrist)])
 
-jitb = PoofsRobot(100, 100, 0, 5000, 200, (28, 28), Piece(PieceType.CONE, Vector3(20, 20, 20)))
-poof = JITBRobot(200, 200, 0, 5000, 170, (26, 26), Piece(PieceType.CUBE, Vector3(-20, 20, 20)))
+poof = PoofsRobot(100, 100, 0, 5000, 200, (28, 28), Piece(PieceType.CONE, Vector3(20, 20, 20)))
+jitb = JITBRobot(200, 200, 0, 5000, 170, (26, 26), Piece(PieceType.CUBE, Vector3(-20, 20, 20)))
 krawler = KrawlerBot(150, 200, 0, 5000, 200, (25, 25), Piece(PieceType.CONE, Vector3()))
 bread = BreadRobot(300, 100, 0, 5000, 220, (30, 30), Piece(PieceType.CONE, Vector3()))
 op = OPRobot(400, 200, 0, 5000, 190, (30, 30), Piece(PieceType.CUBE, Vector3()))
 # sim = SubsystemsSim([ElevatorSim(robot.elevator), ElevatorSim(robot.laterator), PivotSim(robot2.pivot), ElevatorSim(robot2.telescope), PivotSim(robot2.wrist)])
 
 robots = [jitb, poof, krawler, bread, op]
-robots = [op]
+robots = [poof]
 
 # sim.addRobots(robots)
 
