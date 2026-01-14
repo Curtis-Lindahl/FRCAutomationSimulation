@@ -162,6 +162,13 @@ class EnvironmentVisualizer:
         self.robot_viz.handle_input()
         self.subsys_viz.handle_input()
 
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            for robot in self.env.robots:
+                robot.drop()
+                if robot.pieceHeld is None:
+                    robot.runIntake()
+
     def update(self, dt: float):
         # Apply motion via env update (robots will consume target velocities from robot_viz input)
         if hasattr(self.env, 'update'):
@@ -178,10 +185,11 @@ class EnvironmentVisualizer:
 
     # -------------- Drawing --------------
     def draw_pieces(self):
+        """Draw game pieces on the top-down field view (x-y plane)."""
         for piece in self._iter_pieces():
             if not isinstance(piece, Piece):
                 continue
-            # Project x,z plane for field
+            # Project x-y plane for top-down field view
             try:
                 planar = Vector2(piece.pos.x, piece.pos.y)
             except Exception:
@@ -190,10 +198,9 @@ class EnvironmentVisualizer:
             scr = world_to_screen(self.field_origin, self.ppu, planar)
             color = PIECE_COLORS.get(piece.type, (200, 200, 200))
 
-            # Fixed visual size (prevents expansion over time). Use a base size
-            # in pixels; scale slightly by ppu if user wants larger visuals.
-            base_size = 3
-            size = max(4, int(base_size))
+            # Piece size in pixels (scaled appropriately for visibility)
+            base_size = 6  # increased for better visibility
+            size = max(5, int(base_size))
 
             # Draw cones as triangles and cubes as squares (screen-space)
             if piece.type == PieceType.CONE:
@@ -202,13 +209,18 @@ class EnvironmentVisualizer:
                 p2 = (int(scr.x - size), int(scr.y + size))
                 p3 = (int(scr.x + size), int(scr.y + size))
                 pygame.draw.polygon(self.screen, color, [p1, p2, p3])
+                # Draw outline for better visibility
+                pygame.draw.polygon(self.screen, (255, 255, 255), [p1, p2, p3], width=1)
             elif piece.type == PieceType.CUBE:
                 s = size
                 rect = pygame.Rect(int(scr.x - s), int(scr.y - s), int(2 * s), int(2 * s))
                 pygame.draw.rect(self.screen, color, rect)
+                # Draw outline for better visibility
+                pygame.draw.rect(self.screen, (255, 255, 255), rect, width=1)
             else:
                 # fallback to a small circle
                 pygame.draw.circle(self.screen, color, (int(scr.x), int(scr.y)), size)
+                pygame.draw.circle(self.screen, (255, 255, 255), (int(scr.x), int(scr.y)), size, width=1)
 
     def draw_divider(self):
         x = int(self.screen.get_width() * 0.35)
@@ -265,15 +277,15 @@ class EnvironmentVisualizer:
         if self.field_image is not None and self.field_image_rect is not None:
             self.screen.blit(self.field_image, (self.field_image_rect.left, self.field_image_rect.top))
 
-        # Draw pieces and robots on top of the field image
-        # draw scoring nodes before pieces so pieces appear on top
+        # Draw scoring nodes
         if hasattr(self, 'scoring_locations'):
             for loc in self.scoring_locations:
-                print("loc", type(loc[1]))
                 pos = loc[0]
                 screen_pos = world_to_screen(self.field_origin, self.ppu, Vector2(pos.x, pos.y) if hasattr(pos, "x") else Vector2(*pos))
                 color = PIECE_COLORS.get(loc[1], (00, 0, 0))
                 pygame.draw.circle(self.screen, color, (int(screen_pos.x), int(screen_pos.y)), 3)
+        
+        # Draw pieces and robots on top of the field image
         self.draw_pieces()
         self.robot_viz.draw(self.screen, origin=self.field_origin, ppu=self.ppu)
 

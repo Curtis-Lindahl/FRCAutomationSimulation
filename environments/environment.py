@@ -61,13 +61,15 @@ class Environment:
                 return
             
             piece.pos.x += piece.vel.x * time_elapsed
-            piece.pos.y = piece.vel.y * time_elapsed
-            piece.pos.z += max(piece.pos.z - piece.vel.z * time_elapsed, 0)
+            piece.pos.y += piece.vel.y * time_elapsed
+            piece.pos.z = max(piece.pos.z + piece.vel.z * time_elapsed, 0)
 
-            if piece.pos.z != 0:
+            if piece.pos.z > 0:
                 piece.vel.z -= 9.8 * time_elapsed
             else:
                 piece.vel = Vector3(0, 0, 0)
+
+            print(piece.pos)
 
     def checkScoring(self, piece):
         for scoringNodeIndex in len(constants.FIELD_CONSTANTS.SCORING_LOCATIONS):

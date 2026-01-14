@@ -30,8 +30,9 @@ class PoofsRobot(Robot):
     # we will assume 8 wide, 4 tall, and 6 deep
     def getIntakeZone(self):
         endPoint = self.laterator.getEndPosition()
-        point1 = endPoint - Vector3(4, 3, 2)
-        point2 = endPoint + Vector3(4, 3, 2)
+        point1 = endPoint - Vector3(4, 3, 2) + self.pos
+        point2 = endPoint + Vector3(4, 3, 2) + self.pos
+        print(point1, point2)
         return point1, point2
     
     

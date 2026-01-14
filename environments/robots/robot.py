@@ -67,5 +67,8 @@ class Robot:
             return True
         return False
     
+    def drop(self):
+        self.pieceHeld = None
+    
     def runIntake(self):
         self.intaking = not self.intaking
