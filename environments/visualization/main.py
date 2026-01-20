@@ -41,6 +41,6 @@ robots = [poof]
 # robot and could cause confusion). EnvironmentVisualizer will create its
 # own RobotPositionVisualizer bound to the full `robots` list below.
 
-env = Environment(robots=robots, startingPieces=[Piece(PieceType.CONE, Vector3(30, 30, 30)), Piece(PieceType.CUBE, Vector3(30, 30, 30))])
+env = Environment(robots=robots, startingPieces=[Piece(PieceType.CONE, Vector3(30, 90, 30)), Piece(PieceType.CUBE, Vector3(40, 30, 30))])
 viz = EnvironmentVisualizer(env)
 viz.run()

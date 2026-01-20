@@ -8,6 +8,7 @@ from enum import Enum
 from pygame import Vector3
 from constants import FIELD_CONSTANTS
 import constants
+from piece import Piece, PieceType
 
 class MatchMode(Enum):
         AUTO = 0
@@ -58,7 +59,7 @@ class Environment:
         for piece in self.pieces:
             shouldreturn = False
             if self.pieceOnRobot(piece):
-                return
+                continue
             
             piece.pos.x += piece.vel.x * time_elapsed
             piece.pos.y += piece.vel.y * time_elapsed
@@ -70,10 +71,26 @@ class Environment:
                 piece.vel = Vector3(0, 0, 0)
 
             print(piece.pos)
+        self.addPieces()
+
+    def addPieces(self):
+        print('we are going')
+        for spots in [Vector3(240, 7, 42), Vector3(280, 7, 42)]:
+            for spot in [spots, self.flipPoint(spots)]:
+                toadd = True
+                for piece in self.pieces:
+                    if (spot.x - 10 <= piece.pos.x <= spot.x + 10 and
+                    spot.y - 15 <= piece.pos.y <= spot.y + 15 and
+                    spot.z - 10 <= piece.pos.z <= spot.z + 10):
+                        print("we are adding")
+                        toadd = False
+                        piece.pos = spot
+                if toadd:
+                    self.pieces.append(Piece(PieceType.CONE, spot))
 
     def checkScoring(self, piece):
         for scoringNodeIndex in len(constants.FIELD_CONSTANTS.SCORING_LOCATIONS):
-            if piece.pos: # idk just if it's right
+            if piece.pos : # TODO idk just if it's right
                 self.grid[scoringNodeIndex // 3][scoringNodeIndex % 3] += 1
             
     def pieceOnRobot(self, piece):
