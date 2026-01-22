@@ -80,8 +80,8 @@ class EnvironmentVisualizer:
         self.divider_x = int(w * 0.35)
         self.divider_y = int(h * 0.73)  # horizontal divider for bottom side-view panel
         self.subsystem_origin = Vector2(int(w * 0.18), int(h * 0.57))
-        # Side view (x-z) origin at bottom panel
-        self.side_view_origin = Vector2(int(w * 0.50), int(h * 0.95))
+        # Side view (x-z) origin - will be set after field_origin is computed
+        self.side_view_origin = Vector2(0, 0)  # placeholder
 
         # Try to load a field background image and scale it to represent
         # the real field in inches. Robot positions/dimensions are in inches,
@@ -116,12 +116,16 @@ class EnvironmentVisualizer:
 
                 # set field origin (world 0,0) to bottom-left of the image
                 self.field_origin = Vector2(self.field_image_rect.left, self.field_image_rect.top + self.field_image_rect.height)
+                # set side view origin to align with field view (same x, at bottom of side panel)
+                self.side_view_origin = Vector2(self.field_origin.x, self.divider_y + int((h - self.divider_y) * 0.95))
             else:
                 # fallback origin roughly where the original code placed it
                 self.field_origin = Vector2(int(w * 0.60), int(h * 0.78))
+                self.side_view_origin = Vector2(self.field_origin.x, self.divider_y + int((h - self.divider_y) * 0.95))
         except Exception:
             print("Field not found")
             self.field_origin = Vector2(int(w * 0.60), int(h * 0.78))
+            self.side_view_origin = Vector2(self.field_origin.x, self.divider_y + int((h - self.divider_y) * 0.95))
 
         # Robot visualizer (reuse; no extra window created because we pass screen)
         self.robot_viz = RobotPositionVisualizer(robots=self.env.robots, screen=self.screen, screen_size=screen_size, pixels_per_unit=self.ppu)
@@ -228,12 +232,133 @@ class EnvironmentVisualizer:
         # horizontal divider for bottom panel
         pygame.draw.line(self.screen, (70, 75, 85), (0, self.divider_y), (self.screen.get_width(), self.divider_y), 2)
 
+    def draw_subsystems_on_field(self):
+        """Draw subsystems (elevators and pivots) on the main field view (x-y plane), rotated with their robot."""
+        # Match each subsystem to its robot
+        for robot in self.env.robots:
+            for subsys in self.subsys_viz.subsystems:
+                if not hasattr(subsys, 'pos'):
+                    continue
+                try:
+                    # Find subsystem in robot's attributes
+                    belongs_to_robot = False
+                    for attr in dir(robot):
+                        if not attr.startswith('_'):
+                            try:
+                                if getattr(robot, attr) is subsys:
+                                    belongs_to_robot = True
+                                    break
+                            except:
+                                pass
+                    
+                    if not belongs_to_robot:
+                        continue
+                    
+                    if isinstance(subsys, Elevator):
+                        # Get subsystem position relative to robot
+                        local_pos = Vector2(subsys.pos.x, subsys.pos.y) if hasattr(subsys.pos, 'y') else Vector2(subsys.pos.x, 0)
+                        # Rotate by robot angle and translate to robot position
+                        rotated_pos = local_pos.rotate(robot.theta)
+                        world_pos = Vector2(robot.pos.x, robot.pos.y) + rotated_pos
+                        base_screen = world_to_screen(self.field_origin, self.ppu, world_pos)
+                        
+                        # Draw elevator carriage position projected onto field
+                        car_dir = Vector2(0, subsys.height).rotate(subsys.angle + robot.theta)
+                        car_world = world_pos + car_dir
+                        car_screen = world_to_screen(self.field_origin, self.ppu, car_world)
+                        
+                        # Draw line from base to carriage
+                        pygame.draw.line(self.screen, (100, 200, 255), base_screen, car_screen, 3)
+                        pygame.draw.circle(self.screen, (100, 200, 255), car_screen, 5)
+                    
+                    elif isinstance(subsys, Pivot):
+                        # Get subsystem position relative to robot
+                        local_pos = Vector2(subsys.pos.x, subsys.pos.y) if hasattr(subsys.pos, 'y') else Vector2(subsys.pos.x, 0)
+                        # Rotate by robot angle and translate to robot position
+                        rotated_pos = local_pos.rotate(robot.theta)
+                        world_pos = Vector2(robot.pos.x, robot.pos.y) + rotated_pos
+                        base_screen = world_to_screen(self.field_origin, self.ppu, world_pos)
+                        
+                        # Draw pivot arm rotated with robot
+                        arm_dir = Vector2(subsys.length, 0).rotate(subsys.angle + robot.theta)
+                        end_world = world_pos + arm_dir
+                        end_screen = world_to_screen(self.field_origin, self.ppu, end_world)
+                        
+                        # Draw line from base to end
+                        pygame.draw.line(self.screen, (255, 170, 80), base_screen, end_screen, 4)
+                        pygame.draw.circle(self.screen, (255, 170, 80), end_screen, 5)
+                except Exception:
+                    pass
+    
+    def draw_intake_zones(self):
+        """Draw intake zones for all robots as semi-transparent rectangles."""
+        for robot in self.env.robots:
+            try:
+                if hasattr(robot, 'getIntakeZone'):
+                    point1, point2 = robot.getIntakeZone()
+                    
+                    # Get the bounding box in x-y plane
+                    min_x = min(point1.x, point2.x)
+                    max_x = max(point1.x, point2.x)
+                    min_y = min(point1.y, point2.y)
+                    max_y = max(point1.y, point2.y)
+                    
+                    # Convert to screen coordinates
+                    top_left = world_to_screen(self.field_origin, self.ppu, Vector2(min_x, max_y))
+                    bottom_right = world_to_screen(self.field_origin, self.ppu, Vector2(max_x, min_y))
+                    
+                    # Create a semi-transparent surface for the intake zone
+                    width = int(abs(bottom_right.x - top_left.x))
+                    height = int(abs(bottom_right.y - top_left.y))
+                    
+                    if width > 0 and height > 0:
+                        intake_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+                        intake_surface.fill((200, 255, 150, 80))  # Light green, semi-transparent
+                        self.screen.blit(intake_surface, (int(min(top_left.x, bottom_right.x)), int(min(top_left.y, bottom_right.y))))
+                        
+                        # Draw a border around the intake zone
+                        rect = pygame.Rect(int(min(top_left.x, bottom_right.x)), int(min(top_left.y, bottom_right.y)), width, height)
+                        pygame.draw.rect(self.screen, (100, 200, 100), rect, 2)
+            except Exception:
+                pass
+
     def draw_side_view(self):
         """Draw x-z side view of robots and pieces (side profile)."""
         # Draw axis labels
         font = pygame.font.SysFont('consolas', 14)
         label = font.render('Side View (X-Z)', True, (180, 180, 180))
         self.screen.blit(label, (10, self.divider_y + 10))
+
+        # Draw intake zones in side view
+        for robot in self.env.robots:
+            try:
+                if hasattr(robot, 'getIntakeZone'):
+                    point1, point2 = robot.getIntakeZone()
+                    
+                    # Get the bounding box in x-z plane
+                    min_x = min(point1.x, point2.x)
+                    max_x = max(point1.x, point2.x)
+                    min_z = min(point1.z, point2.z)
+                    max_z = max(point1.z, point2.z)
+                    
+                    # Convert to screen coordinates
+                    top_left = world_to_screen(self.side_view_origin, self.ppu, Vector2(min_x, max_z))
+                    bottom_right = world_to_screen(self.side_view_origin, self.ppu, Vector2(max_x, min_z))
+                    
+                    # Create a semi-transparent surface for the intake zone
+                    width = int(abs(bottom_right.x - top_left.x))
+                    height = int(abs(bottom_right.y - top_left.y))
+                    
+                    if width > 0 and height > 0:
+                        intake_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+                        intake_surface.fill((200, 255, 150, 80))  # Light green, semi-transparent
+                        self.screen.blit(intake_surface, (int(min(top_left.x, bottom_right.x)), int(min(top_left.y, bottom_right.y))))
+                        
+                        # Draw a border around the intake zone
+                        rect = pygame.Rect(int(min(top_left.x, bottom_right.x)), int(min(top_left.y, bottom_right.y)), width, height)
+                        pygame.draw.rect(self.screen, (100, 200, 100), rect, 2)
+            except Exception:
+                pass
 
         # Draw robots in x-z plane
         for robot in self.env.robots:
@@ -287,7 +412,9 @@ class EnvironmentVisualizer:
         
         # Draw pieces and robots on top of the field image
         self.draw_pieces()
+        self.draw_intake_zones()
         self.robot_viz.draw(self.screen, origin=self.field_origin, ppu=self.ppu)
+        self.draw_subsystems_on_field()
 
         # Draw divider (separates left and right panels)
         self.draw_divider()

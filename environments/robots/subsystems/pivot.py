@@ -32,6 +32,12 @@ class Pivot:
 
         self.angle += self.turnRate * time_elapsed
 
+        if self.angle > self.maxAngle:
+            self.angle = self.maxAngle
+
+        if self.angle < 0:
+            self.angle = 0
+
     def getEndPosition(self):
         return self.pos + (Vector3(self.length, 0, 0).rotate(-(self.angle + self.angleOffset), Vector3(0, 1, 0)))
     

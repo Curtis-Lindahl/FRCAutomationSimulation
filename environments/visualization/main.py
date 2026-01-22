@@ -42,5 +42,5 @@ robots = [poof]
 # own RobotPositionVisualizer bound to the full `robots` list below.
 
 env = Environment(robots=robots, startingPieces=[Piece(PieceType.CONE, Vector3(30, 90, 30)), Piece(PieceType.CUBE, Vector3(40, 30, 30))])
-viz = EnvironmentVisualizer(env)
+viz = EnvironmentVisualizer(env, screen_size=(1280, 800))
 viz.run()

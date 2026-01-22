@@ -31,8 +31,14 @@ class Elevator:
 
         self.height += self.dheight * time_elapsed
 
+        if self.height > self.maxheight:
+            self.height = self.maxheight
+
+        if self.height < 0:
+            self.height = 0
+
     def getEndPosition(self) -> Vector3:
-        return Vector3(0, self.height, 0).rotate(self.angle, Vector3(1, 0, 0))
+        return Vector3(0, 0, self.height).rotate(self.angle, Vector3(1, 0, 0))
     
     def setTargetVel(self, targetVel):
         self.targetVel = targetVel
