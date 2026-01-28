@@ -49,6 +49,50 @@ class Environment:
         for robot in self.robots:
             robot.update(time_elapsed)
             self.checkIntake(robot)
+            self.checkBorders(robot)
+
+    def checkBorders(self, robot):
+        # edges
+        if robot.pos.x + robot.frame[0]/2 > constants.FIELD_WIDTH:
+            robot.pos.x = constants.FIELD_WIDTH - robot.frame[0]/2
+        if robot.pos.x - robot.frame[0]/2 < 0:
+            robot.pos.x = robot.frame[0]/2
+        if robot.pos.y + robot.frame[1]/2 > constants.FIELD_HEIGHT:
+            robot.pos.y = constants.FIELD_HEIGHT - robot.frame[1]/2
+        if robot.pos.y - robot.frame[1]/2 < 0:
+            robot.pos.y = robot.frame[1]/2
+
+        # divider between alliance safe areas
+        if robot.pos.y - robot.frame[0]/2 < 132.25 or robot.pos.y + robot.frame[0]/2 > constants.FIELD_HEIGHT - 132.25:
+            if robot.pos.x + robot.frame[0]/2 > 216 and robot.pos.x < 216:
+                robot.pos.x = 216 - robot.frame[0]/2
+            if robot.pos.x - robot.frame[0]/2 < 216 and robot.pos.x > 216:
+                robot.pos.x = 216 + robot.frame[0]/2
+
+        LEFT_EDGE_POS = 60
+        RIGHT_EDGE_POS = 157
+        CHARGE_LOW_POS = 120
+        CHARGE_HIGH_POS = 190
+
+        # charge station edges
+        if (robot.pos.y - robot.frame[0]/2 < CHARGE_HIGH_POS and robot.pos.y + robot.frame[0]/2 > CHARGE_LOW_POS) or ((robot.pos.y + robot.frame[0]/2 > constants.FIELD_HEIGHT - CHARGE_HIGH_POS and robot.pos.y - robot.frame[0]/2 < constants.FIELD_HEIGHT - CHARGE_LOW_POS)):
+            if robot.pos.x + robot.frame[0]/2 > LEFT_EDGE_POS and robot.pos.x < LEFT_EDGE_POS:
+                robot.pos.x = LEFT_EDGE_POS - robot.frame[0]/2
+            if robot.pos.x - robot.frame[0]/2 < LEFT_EDGE_POS and robot.pos.x > LEFT_EDGE_POS:
+                robot.pos.x = LEFT_EDGE_POS + robot.frame[0]/2
+
+        if (robot.pos.y - robot.frame[0]/2 < CHARGE_HIGH_POS and robot.pos.y + robot.frame[0]/2 > CHARGE_LOW_POS) or (robot.pos.y + robot.frame[0]/2 > constants.FIELD_HEIGHT - CHARGE_HIGH_POS and robot.pos.y - robot.frame[0]/2 < constants.FIELD_HEIGHT - CHARGE_LOW_POS):
+            if robot.pos.x + robot.frame[0]/2 > RIGHT_EDGE_POS and robot.pos.x < RIGHT_EDGE_POS:
+                robot.pos.x = RIGHT_EDGE_POS - robot.frame[0]/2
+            if robot.pos.x - robot.frame[0]/2 < RIGHT_EDGE_POS and robot.pos.x > RIGHT_EDGE_POS:
+                robot.pos.x = RIGHT_EDGE_POS + robot.frame[0]/2
+
+        # grid front
+        if robot.pos.x < 216:
+            if robot.pos.y - robot.frame[0]/2 < 56:
+                robot.pos.y = 56 + robot.frame[0]/2
+            if robot.pos.y + robot.frame[0]/2 > constants.FIELD_HEIGHT - 56:
+                robot.pos.y = constants.FIELD_HEIGHT - (56 + robot.frame[0]/2)
 
     def checkIntake(self, robot):
         if robot.intaking:
