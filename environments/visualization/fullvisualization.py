@@ -139,8 +139,6 @@ class EnvironmentVisualizer:
 
         # Collect subsystems from robots plus any provided extras
         subsystems = list(self._collect_subsystems(self.env.robots))
-        print(self.env.robots)
-        print(subsystems)
         self.subsys_viz = SubsystemVisualizer(subsystems=subsystems, origin=self.subsystem_origin, pixels_per_unit=self.ppu)
 
     # -------------- Helpers --------------

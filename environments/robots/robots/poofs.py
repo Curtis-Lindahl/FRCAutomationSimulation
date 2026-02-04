@@ -29,10 +29,10 @@ class PoofsRobot(Robot):
     # returns 2 positions that represent two vertices of the box of which if a piece is in it would intake
     # we will assume 8 wide, 4 tall, and 6 deep
     def getIntakeZone(self):
+        tolerance = Vector3(10, 10, 10)
         endPoint = self.laterator.getEndPosition().rotate(self.theta, Vector3(0, 0, 1))
-        point1 = endPoint - Vector3(4, 3, 6) + Vector3(self.pos.x, self.pos.y, 0)
-        point2 = endPoint + Vector3(4, 3, 2) + Vector3(self.pos.x, self.pos.y, 0)
-        print(point1, point2)
+        point1 = endPoint - tolerance + Vector3(self.pos.x, self.pos.y, 0)
+        point2 = endPoint + tolerance + Vector3(self.pos.x, self.pos.y, 0)
         return point1, point2
     
     

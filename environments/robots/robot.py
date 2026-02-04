@@ -61,6 +61,8 @@ class Robot:
     def intake(self, piece: Piece):
         if self.pieceHeld is not None:
             return False
+        if piece.scored:
+            return False
         if self.canIntake(piece):
             self.pieceHeld = piece
             self.intaking = False
@@ -71,4 +73,4 @@ class Robot:
         self.pieceHeld = None
     
     def runIntake(self):
-        self.intaking = not self.intaking
+        self.intaking = True

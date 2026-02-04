@@ -8,7 +8,8 @@ from enum import Enum
 from pygame import Vector3
 from constants import FIELD_CONSTANTS
 import constants
-from piece import Piece, PieceType
+from piece import NodeType, Piece, PieceType
+import time
 
 class MatchMode(Enum):
         AUTO = 0
@@ -50,6 +51,9 @@ class Environment:
             robot.update(time_elapsed)
             self.checkIntake(robot)
             self.checkBorders(robot)
+            for piece in self.pieces:
+                self.checkScoring(piece)
+            self.scoring.update()
 
     def checkBorders(self, robot):
         # edges
@@ -101,6 +105,9 @@ class Environment:
 
     def movePieces(self, time_elapsed):
         for piece in self.pieces:
+            if piece.scored:
+                continue
+
             shouldreturn = False
             if self.pieceOnRobot(piece):
                 continue
@@ -114,11 +121,9 @@ class Environment:
             else:
                 piece.vel = Vector3(0, 0, 0)
 
-            print(piece.pos)
         self.addPieces()
 
     def addPieces(self):
-        print('we are going')
         for spots in [Vector3(240, 7, 42), Vector3(280, 7, 42)]:
             for spot in [spots, self.flipPoint(spots)]:
                 toadd = True
@@ -126,16 +131,24 @@ class Environment:
                     if (spot.x - 10 <= piece.pos.x <= spot.x + 10 and
                     spot.y - 15 <= piece.pos.y <= spot.y + 15 and
                     spot.z - 10 <= piece.pos.z <= spot.z + 10):
-                        print("we are adding")
                         toadd = False
-                        piece.pos = spot
+                        piece.pos.z = spot.z
                 if toadd:
-                    self.pieces.append(Piece(PieceType.CONE, spot))
+                    self.pieces.append(Piece(PieceType.CUBE, spot))
 
     def checkScoring(self, piece):
-        for scoringNodeIndex in len(constants.FIELD_CONSTANTS.SCORING_LOCATIONS):
-            if piece.pos : # TODO idk just if it's right
-                self.grid[scoringNodeIndex // 3][scoringNodeIndex % 3] += 1
+        for scoringNodeIndex in range(len(constants.FIELD_CONSTANTS.SCORING_LOCATIONS)):
+            if piece.scored or self.pieceOnRobot(piece):
+                continue
+            if constants.FIELD_CONSTANTS.SCORING_LOCATIONS[scoringNodeIndex][1] != NodeType.HYBRID and constants.FIELD_CONSTANTS.SCORING_LOCATIONS[scoringNodeIndex][1].value != piece.type.value:
+                continue
+            spot = constants.FIELD_CONSTANTS.SCORING_LOCATIONS[scoringNodeIndex][0]
+            if (piece.pos.x - 5 < spot.x and piece.pos.x + 5 > spot.x and
+                piece.pos.y - 5 < spot.y and piece.pos.y + 5 > spot.y and
+                piece.pos.z - 5 < spot.z and piece.pos.z + 5 > spot.z):
+                self.scoring.grid["Red"][scoringNodeIndex // 9][scoringNodeIndex % 3] += 1
+                piece.scored = True
+                print("scored")
             
     def pieceOnRobot(self, piece):
         for robot in self.robots:
@@ -197,6 +210,10 @@ class ScoringManager:
                     for node in row:
                         if node > 1:
                             score[alliance] += 3
+        return score
+
+    def update(self):
+        self.score = self.calculateGridScore()
 
     def calculateLinks(self):
         links = {"Red": 0, "Blue": 0}

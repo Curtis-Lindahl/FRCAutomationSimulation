@@ -16,3 +16,4 @@ class Piece:
         self.pos = pos
         self.type = type
         self.vel = Vector3(0, 0, 0)
+        self.scored = False

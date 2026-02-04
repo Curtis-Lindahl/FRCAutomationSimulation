@@ -38,7 +38,7 @@ class Elevator:
             self.height = 0
 
     def getEndPosition(self) -> Vector3:
-        return Vector3(0, 0, self.height).rotate(self.angle, Vector3(1, 0, 0))
+        return Vector3(0, 0, self.height).rotate(self.angle, Vector3(1, 0, 0)) + self.pos
     
     def setTargetVel(self, targetVel):
         self.targetVel = targetVel
