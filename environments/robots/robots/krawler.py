@@ -2,7 +2,7 @@ from robot import Robot
 from subsystems.pivot import Pivot
 from subsystems.elevator import Elevator
 from pygame import Vector2, Vector3
-from piece import Piece
+from environments.piece import Piece
 
 class KrawlerBot(Robot):
     

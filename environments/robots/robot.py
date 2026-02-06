@@ -4,7 +4,7 @@ parent_dir = str(Path(__file__).resolve().parents[1])
 sys.path.insert(0, parent_dir)
 from pygame import Vector2
 
-from piece import Piece
+from environments.piece import Piece
 
 class Robot:
 

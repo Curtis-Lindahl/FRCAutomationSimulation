@@ -41,12 +41,12 @@ def _augment_path():
 
 
 _augment_path()
-from piece import Piece, PieceType  # type: ignore
+from environments.piece import Piece, PieceType  # type: ignore
 from environment import Environment
-from robotvisualization import RobotPositionVisualizer  # type: ignore
-from subsystemvisualization import SubsystemVisualizer  # type: ignore
+from environments.visualization.robotvisualization import RobotPositionVisualizer  # type: ignore
+from environments.visualization.subsystemvisualization import SubsystemVisualizer  # type: ignore
 from constants import FIELD_CONSTANTS
-from piece import NodeType
+from environments.piece import NodeType
 from subsystems.elevator import Elevator
 from subsystems.pivot import Pivot
 
@@ -189,7 +189,7 @@ class EnvironmentVisualizer:
     def draw_pieces(self):
         """Draw game pieces on the top-down field view (x-y plane)."""
         for piece in self._iter_pieces():
-            if not isinstance(piece, Piece):
+            if not (hasattr(piece, 'pos') and hasattr(piece, 'type')):
                 continue
             # Project x-y plane for top-down field view
             try:
@@ -198,6 +198,8 @@ class EnvironmentVisualizer:
                 # skip pieces with unexpected position format
                 continue
             scr = world_to_screen(self.field_origin, self.ppu, planar)
+            print(piece.type)
+            
             color = PIECE_COLORS.get(piece.type, (200, 200, 200))
 
             # Piece size in pixels (scaled appropriately for visibility)
@@ -428,21 +430,22 @@ class EnvironmentVisualizer:
 
     # -------------- Main Loop --------------
     def run(self):
-        while self.running:
-            dt = self.clock.tick(60) / 1000.0
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.running = False
-                    elif event.key == pygame.K_r:
-                        self.reset()
+        dt = self.clock.tick(60) / 1000.0
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         self.running = False
+        #     elif event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_ESCAPE:
+        #             self.running = False
+        #         elif event.key == pygame.K_r:
+        #             self.reset()
+        pygame.event.get()
 
-            self.handle_input()
-            self.update(dt)
-            self.draw()
+        self.handle_input()
+        self.update(dt)
+        self.draw()
 
+    def quit():
         pygame.quit()
 
     # -------------- Reset --------------

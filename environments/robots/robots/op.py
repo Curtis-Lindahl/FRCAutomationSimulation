@@ -1,7 +1,7 @@
 from pygame import Vector2, Vector3
 from robot import Robot
 import subsystems.pivot
-from piece import Piece
+from environments.piece import Piece
 
 class OPRobot(Robot):
     def __init__(self, x, y, theta, maxaccel, maxvel, frame_size, piece):

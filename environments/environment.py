@@ -143,8 +143,8 @@ class Environment:
             if constants.FIELD_CONSTANTS.SCORING_LOCATIONS[scoringNodeIndex][1] != NodeType.HYBRID and constants.FIELD_CONSTANTS.SCORING_LOCATIONS[scoringNodeIndex][1].value != piece.type.value:
                 continue
             spot = constants.FIELD_CONSTANTS.SCORING_LOCATIONS[scoringNodeIndex][0]
-            if (piece.pos.x - 5 < spot.x and piece.pos.x + 5 > spot.x and
-                piece.pos.y - 5 < spot.y and piece.pos.y + 5 > spot.y and
+            if (piece.pos.x - 10 < spot.x and piece.pos.x + 10 > spot.x and
+                piece.pos.y - 8 < spot.y and piece.pos.y + 8 > spot.y and
                 piece.pos.z - 5 < spot.z and piece.pos.z + 5 > spot.z):
                 self.scoring.grid["Red"][scoringNodeIndex // 9][scoringNodeIndex % 3] += 1
                 piece.scored = True

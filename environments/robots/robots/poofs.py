@@ -5,7 +5,7 @@ parent_dir = str(Path(__file__).resolve().parents[1])
 
 sys.path.insert(0, parent_dir)
 from robot import Robot # use the module name
-from piece import Piece
+from environments.piece import Piece
 
 from pygame import Vector2, Vector3
 import subsystems.elevator

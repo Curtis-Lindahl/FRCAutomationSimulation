@@ -1,7 +1,7 @@
 from robot import Robot
 from pygame import Vector2, Vector3
 import subsystems.elevator, subsystems.pivot
-from piece import Piece
+from environments.piece import Piece
 
 # Telescoping arm on a wrist with low rear pivot
 class JITBRobot(Robot):
