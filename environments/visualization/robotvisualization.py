@@ -79,19 +79,19 @@ class RobotPositionVisualizer:
         if keys[pygame.K_DOWN]:
             target_vel.y -= move_speed
 
-        for robot in self.robots:
-            robot.setTargetVel(target_vel)
+        # for robot in self.robots:
+        #     robot.setTargetVel(target_vel)
 
         rot_speed = 120
-        if keys[pygame.K_q]:
-            for robot in self.robots:
-                robot.setTargetRotSpeed(rot_speed)
-        elif keys[pygame.K_e]:
-            for robot in self.robots:
-                robot.setTargetRotSpeed(-rot_speed)
-        else:
-            for robot in self.robots:
-                robot.setTargetRotSpeed(0)
+        # if keys[pygame.K_q]:
+        #     for robot in self.robots:
+        #         robot.setTargetRotSpeed(rot_speed)
+        # elif keys[pygame.K_e]:
+        #     for robot in self.robots:
+        #         robot.setTargetRotSpeed(-rot_speed)
+        # else:
+        #     for robot in self.robots:
+        #         robot.setTargetRotSpeed(0)
 
     def update(self, dt: float):
         for robot in self.robots:

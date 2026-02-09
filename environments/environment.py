@@ -42,9 +42,6 @@ class Environment:
 
     def endMatch(self):
         self.mode = MatchMode.DISABLED
-        
-    def flipPoint(self, point: Vector3):
-        return Vector3(point.x, constants.FIELD_HEIGHT - point.y, point.z)
 
     def update(self, time_elapsed):
         for robot in self.robots:
@@ -124,17 +121,16 @@ class Environment:
         self.addPieces()
 
     def addPieces(self):
-        for spots in [Vector3(240, 7, 42), Vector3(280, 7, 42)]:
-            for spot in [spots, self.flipPoint(spots)]:
-                toadd = True
-                for piece in self.pieces:
-                    if (spot.x - 10 <= piece.pos.x <= spot.x + 10 and
-                    spot.y - 15 <= piece.pos.y <= spot.y + 15 and
-                    spot.z - 10 <= piece.pos.z <= spot.z + 10):
-                        toadd = False
-                        piece.pos.z = spot.z
-                if toadd:
-                    self.pieces.append(Piece(PieceType.CUBE, spot))
+        for spot in [constants.FIELD_CONSTANTS.BLUE_SUBSTATION_LEFT, constants.FIELD_CONSTANTS.BLUE_SUBSTATION_RIGHT, constants.FIELD_CONSTANTS.RED_SUBSTATION_LEFT, constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT]:
+            toadd = True
+            for piece in self.pieces:
+                if (spot.x - 10 <= piece.pos.x <= spot.x + 10 and
+                spot.y - 15 <= piece.pos.y <= spot.y + 15 and
+                spot.z - 10 <= piece.pos.z <= spot.z + 10):
+                    toadd = False
+                    piece.pos.z = spot.z
+            if toadd:
+                self.pieces.append(Piece(PieceType.CUBE, spot))
 
     def checkScoring(self, piece):
         for scoringNodeIndex in range(len(constants.FIELD_CONSTANTS.SCORING_LOCATIONS)):

@@ -18,7 +18,9 @@ from environments.robots.robots.krawler import KrawlerBot
 from environments.robots.robots.bread import BreadRobot
 from environments.robots.robots.op import OPRobot
 
-import keyboard
+import time
+
+import constants
 
 # robot = PoofsRobot(0, 0, 0, 0, 0, (20, 20))
 # sim = Sim([ElevatorSim(robot.elevator), ElevatorSim(robot.laterator)])
@@ -27,11 +29,10 @@ import keyboard
 # sim = Sim([PivotSim(robot.pivot), ElevatorSim(robot.telescope), PivotSim(robot.wrist)])
 
 def run():
-    running = True
-    while running:
-        pathing.driveToTarget(Vector2(300, 400))
+    startTime = time.time()
+    while pathing.driveToTarget():
         viz.run()
-
+    print("Final Time:", time.time() - startTime)
 
     viz.quit()
 
@@ -56,5 +57,25 @@ robots = [poof]
 env = Environment(robots=robots, startingPieces=[Piece(PieceType.CONE, Vector3(20.5, 14.25, 46)), Piece(PieceType.CUBE, Vector3(40, 30, 30))])
 viz = EnvironmentVisualizer(env, screen_size=(1280, 800))
 
+
 pathing = Pathfollow(robots[0])
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[8][0].x, 70), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[7][0].x, 70), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[6][0].x, 70), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[5][0].x, 70), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[4][0].x, 70), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[3][0].x, 70), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[2][0].x, 70), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[1][0].x, 70), 0)
+pathing.addPath(Vector2(100, 250), 0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[0][0].x, 70), 0)
 run()

@@ -198,7 +198,6 @@ class EnvironmentVisualizer:
                 # skip pieces with unexpected position format
                 continue
             scr = world_to_screen(self.field_origin, self.ppu, planar)
-            print(piece.type)
             
             color = PIECE_COLORS.get(piece.type, (200, 200, 200))
 

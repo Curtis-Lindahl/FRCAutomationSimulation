@@ -4,6 +4,12 @@ from pygame import Vector2, Vector3
 FIELD_WIDTH = 315.5
 FIELD_HEIGHT = 651.25
 
+def flipPoint(point: Vector3):
+    return Vector3(point.x, FIELD_HEIGHT - point.y, point.z)
+
+def pickupSpot(point: Vector3):
+    return Vector3(point.x, point.y - 20, point.z)
+
 class POOFS_BOT:
     MAX_ACCEL = 10
     FRAME_SIZE = 26
@@ -40,6 +46,11 @@ class FIELD_CONSTANTS:
     [Vector3(171.75, 47, 0), NodeType.HYBRID],
     [Vector3(193.75, 47, 0), NodeType.HYBRID]
     ]
+
+    BLUE_SUBSTATION_LEFT = Vector3(240, 7, 42)
+    BLUE_SUBSTATION_RIGHT = Vector3(280, 7, 42)
+    RED_SUBSTATION_LEFT = flipPoint(BLUE_SUBSTATION_LEFT)
+    RED_SUBSTATION_RIGHT = flipPoint(BLUE_SUBSTATION_RIGHT)
 
     chargeStationTopRight = Vector2(156.64, 191.125) # heres the top right
     chargeStationBottomLeft = Vector2(59.39, 115) # heres the bottom left
