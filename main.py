@@ -2,8 +2,6 @@ from pathlib import Path
 import sys
 
 from autopaths import Pathfollow
-parent_dir = str(Path(__file__).resolve().parents[1])
-sys.path.insert(0, parent_dir)
 
 from pygame import Vector2, Vector3
 
@@ -18,8 +16,6 @@ from environments.robots.robots.krawler import KrawlerBot
 from environments.robots.robots.bread import BreadRobot
 from environments.robots.robots.op import OPRobot
 
-import time
-
 import constants
 
 # robot = PoofsRobot(0, 0, 0, 0, 0, (20, 20))
@@ -29,10 +25,17 @@ import constants
 # sim = Sim([PivotSim(robot.pivot), ElevatorSim(robot.telescope), PivotSim(robot.wrist)])
 
 def run():
-    startTime = time.time()
-    while pathing.driveToTarget():
-        viz.run()
-    print("Final Time:", time.time() - startTime)
+    totaltime = 0
+    while pathing.runCommand() and totaltime < 135:
+        dt = .1
+        viz.env.update(dt)
+        # viz.run(dt)
+        totaltime += dt
+        # print(totaltime)
+        
+    print(pathing.index, pathing.commands[pathing.index])
+    print(viz.env.scoring.score)
+    print(viz.env.scoring.grid)
 
     viz.quit()
 
@@ -54,28 +57,79 @@ robots = [poof]
 # robot and could cause confusion). EnvironmentVisualizer will create its
 # own RobotPositionVisualizer bound to the full `robots` list below.
 
-env = Environment(robots=robots, startingPieces=[Piece(PieceType.CONE, Vector3(20.5, 14.25, 46)), Piece(PieceType.CUBE, Vector3(40, 30, 30))])
+env = Environment(robots=robots, startingPieces=[])
 viz = EnvironmentVisualizer(env, screen_size=(1280, 800))
 
 
-pathing = Pathfollow(robots[0])
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[8][0].x, 70), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[7][0].x, 70), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[6][0].x, 70), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[5][0].x, 70), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[4][0].x, 70), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[3][0].x, 70), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[2][0].x, 70), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[1][0].x, 70), 0)
-pathing.addPath(Vector2(100, 250), 0)
-pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), 180)
-pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[0][0].x, 70), 0)
+pathing = Pathfollow(robots[0], env)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[8][0].x, 70), 90)
+pathing.addMoveArm(30.0, 40.0)
+pathing.addDrop(10)
+pathing.changePiece(PieceType.CUBE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addMoveArm(30.0, 40.0)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[7][0].x, 70), 90)
+pathing.addDrop(25)
+pathing.changePiece(PieceType.CONE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[6][0].x, 70), 90)
+pathing.addDrop(30)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[5][0].x, 70), 90)
+pathing.addDrop(40)
+pathing.changePiece(PieceType.CUBE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[4][0].x, 70), 90)
+pathing.addDrop(55)
+pathing.changePiece(PieceType.CONE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[3][0].x, 70), 90)
+pathing.addDrop(60)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[2][0].x, 70), 90)
+pathing.addDrop(70)
+pathing.changePiece(PieceType.CUBE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[1][0].x, 70), 90)
+pathing.addDrop(85)
+pathing.changePiece(PieceType.CONE)
+pathing.addPath(Vector2(100, 250), 90)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[0][0].x, 70), 90)
+pathing.addDrop(90)
+pathing.addMoveArm(30.0, 25.0)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[8][0].x, 70), 90)
+pathing.addDrop(100)
+pathing.changePiece(PieceType.CUBE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[7][0].x, 70), 90)
+pathing.addDrop(115)
+pathing.changePiece(PieceType.CONE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[6][0].x, 70), 90)
+pathing.addDrop(120)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[5][0].x, 70), 90)
+pathing.addDrop(130)
+pathing.changePiece(PieceType.CUBE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[4][0].x, 70), 90)
+pathing.addDrop(145)
+pathing.changePiece(PieceType.CONE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[3][0].x, 70), 90)
+pathing.addDrop(150)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[2][0].x, 70), 90)
+pathing.addDrop(160)
+pathing.changePiece(PieceType.CUBE)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[1][0].x, 70), 90)
+pathing.addDrop(170)
+pathing.addPath(Vector2(100, 250), 90)
+pathing.addPath(constants.pickupSpot(constants.FIELD_CONSTANTS.RED_SUBSTATION_RIGHT), -90)
+pathing.addDrop(180)
+pathing.addPath(Vector2(constants.FIELD_CONSTANTS.SCORING_LOCATIONS[0][0].x, 70), 90)
 run()

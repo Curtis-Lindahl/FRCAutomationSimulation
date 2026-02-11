@@ -173,17 +173,17 @@ class EnvironmentVisualizer:
 
     def update(self, dt: float):
         # Apply motion via env update (robots will consume target velocities from robot_viz input)
-        if hasattr(self.env, 'update'):
-            self.env.update(dt)
-        if hasattr(self.env, 'movePieces'):
-            try:
-                self.env.movePieces(dt)
-            except TypeError:
-                # movePieces might not accept dt; ignore
-                try:
-                    self.env.movePieces()
-                except Exception:
-                    pass
+        # if hasattr(self.env, 'update'):
+        self.env.update(dt)
+        # if hasattr(self.env, 'movePieces'):
+        #     try:
+        #         self.env.movePieces(dt)
+        #     except TypeError:
+        #         # movePieces might not accept dt; ignore
+        #         try:
+        #             self.env.movePieces()
+        #         except Exception:
+        #             pass
 
     # -------------- Drawing --------------
     def draw_pieces(self):
@@ -428,8 +428,8 @@ class EnvironmentVisualizer:
         pygame.display.flip()
 
     # -------------- Main Loop --------------
-    def run(self):
-        dt = self.clock.tick(60) / 1000.0
+    def run(self, dt):
+        # dt = .05
         # for event in pygame.event.get():
         #     if event.type == pygame.QUIT:
         #         self.running = False
@@ -440,11 +440,11 @@ class EnvironmentVisualizer:
         #             self.reset()
         pygame.event.get()
 
-        self.handle_input()
+        # self.handle_input()
         self.update(dt)
         self.draw()
 
-    def quit():
+    def quit(self):
         pygame.quit()
 
     # -------------- Reset --------------

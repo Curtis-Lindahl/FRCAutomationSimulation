@@ -8,8 +8,7 @@ from enum import Enum
 from pygame import Vector3
 from constants import FIELD_CONSTANTS
 import constants
-from piece import NodeType, Piece, PieceType
-import time
+from environments.piece import NodeType, Piece, PieceType
 
 class MatchMode(Enum):
         AUTO = 0
@@ -27,6 +26,7 @@ class Environment:
         self.timeRemaining = 0
         self.scoring = ScoringManager()
         self.mode = MatchMode.DISABLED
+        self.pieceToAdd = PieceType.CONE
 
     def endAuto(self):
         self.scoring.updateEndOfAuto()
@@ -51,6 +51,7 @@ class Environment:
             for piece in self.pieces:
                 self.checkScoring(piece)
             self.scoring.update()
+            self.movePieces(time_elapsed)
 
     def checkBorders(self, robot):
         # edges
@@ -105,7 +106,6 @@ class Environment:
             if piece.scored:
                 continue
 
-            shouldreturn = False
             if self.pieceOnRobot(piece):
                 continue
             
@@ -128,9 +128,11 @@ class Environment:
                 spot.y - 15 <= piece.pos.y <= spot.y + 15 and
                 spot.z - 10 <= piece.pos.z <= spot.z + 10):
                     toadd = False
-                    piece.pos.z = spot.z
+                    piece.pos.z = spot.copy().z
+                    piece.vel.z = 0
+                    piece.type = self.pieceToAdd
             if toadd:
-                self.pieces.append(Piece(PieceType.CUBE, spot))
+                self.pieces.append(Piece(self.pieceToAdd, spot.copy()))
 
     def checkScoring(self, piece):
         for scoringNodeIndex in range(len(constants.FIELD_CONSTANTS.SCORING_LOCATIONS)):
@@ -142,9 +144,8 @@ class Environment:
             if (piece.pos.x - 10 < spot.x and piece.pos.x + 10 > spot.x and
                 piece.pos.y - 8 < spot.y and piece.pos.y + 8 > spot.y and
                 piece.pos.z - 5 < spot.z and piece.pos.z + 5 > spot.z):
-                self.scoring.grid["Red"][scoringNodeIndex // 9][scoringNodeIndex % 3] += 1
+                self.scoring.grid["Red"][scoringNodeIndex // 9][scoringNodeIndex % 9] += 1
                 piece.scored = True
-                print("scored")
             
     def pieceOnRobot(self, piece):
         for robot in self.robots:
@@ -222,5 +223,5 @@ class ScoringManager:
                     self.grid[alliance][level][i+2] > 0 and
                     not any(used[i:i+3])):
                         links[alliance] += 1
-                    used[i:i+3] = [True, True, True]
-        return links
+                        used[i:i+3] = [True, True, True]
+        return links 

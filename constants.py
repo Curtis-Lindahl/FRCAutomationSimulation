@@ -8,7 +8,7 @@ def flipPoint(point: Vector3):
     return Vector3(point.x, FIELD_HEIGHT - point.y, point.z)
 
 def pickupSpot(point: Vector3):
-    return Vector3(point.x, point.y - 20, point.z)
+    return Vector3(point.x, point.y - 28, point.z)
 
 class POOFS_BOT:
     MAX_ACCEL = 10

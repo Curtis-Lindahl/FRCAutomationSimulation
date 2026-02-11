@@ -5,7 +5,7 @@ sys.path.insert(0, parent_dir)
 
 from pygame import Vector3
 
-from piece import Piece, PieceType
+from environments.piece import Piece, PieceType
 from fullvisualization import EnvironmentVisualizer
 
 
